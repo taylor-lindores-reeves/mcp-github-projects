@@ -10,6 +10,7 @@
     "build": "bun build ./index.ts --outdir ./dist",
     "lint": "tsc --noEmit",
     "test": "bun test",
+    "test:mcp": "bun run src/test-mcp-server.ts",
     "test:github": "bun test tests/index.test.ts",
     "test:github:dry": "DRY_RUN=true bun test tests/index.test.ts",
     "test:github:projects": "RUN_ONLY_TESTS=list-projects,create-project bun test tests/projects.test.ts"
