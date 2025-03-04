@@ -1,3 +1,4 @@
+import config from "../config";
 import { GitHubService } from "../services/github.service";
 import type { MCPResource, Project } from "../types";
 
@@ -26,15 +27,17 @@ export function formatProjectResource(project: Project): MCPResource {
  */
 export class ProjectResource {
 	private githubService: GitHubService;
+	private username: string;
 
 	constructor(userToken?: string) {
 		this.githubService = new GitHubService({ token: userToken });
+		this.username = config.GITHUB_USERNAME;
 	}
 
 	/**
 	 * List projects for a user or organization
 	 */
-	async listProjects(owner: string): Promise<MCPResource[]> {
+	async listProjects(owner?: string): Promise<MCPResource[]> {
 		try {
 			const projects = await this.githubService.getProjects(owner);
 			return projects.map(formatProjectResource);
@@ -48,15 +51,15 @@ export class ProjectResource {
 	 * Create a new project
 	 */
 	async createProject(
-		owner: string,
 		title: string,
 		description: string,
+		owner?: string,
 	): Promise<MCPResource> {
 		try {
 			const project = await this.githubService.createProject(
-				owner,
 				title,
 				description,
+				owner,
 			);
 			return formatProjectResource(project);
 		} catch (error) {
@@ -75,19 +78,15 @@ export class ProjectResource {
 				parameters: {
 					owner: {
 						type: "string",
-						description: "GitHub username or organization name",
-						required: true,
+						description:
+							"GitHub username or organization name (defaults to GITHUB_USERNAME environment variable)",
+						required: false,
 					},
 				},
 			},
 			"create-project": {
 				description: "Create a new project",
 				parameters: {
-					owner: {
-						type: "string",
-						description: "GitHub username or organization name",
-						required: true,
-					},
 					title: {
 						type: "string",
 						description: "Title of the project",
@@ -96,6 +95,12 @@ export class ProjectResource {
 					description: {
 						type: "string",
 						description: "Description of the project",
+						required: true,
+					},
+					owner: {
+						type: "string",
+						description:
+							"GitHub username or organization name (defaults to GITHUB_USERNAME environment variable)",
 						required: false,
 					},
 				},

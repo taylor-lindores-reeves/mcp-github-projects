@@ -10,6 +10,7 @@ import {
 
 interface GitHubServiceOptions {
 	token?: string;
+	username?: string;
 }
 
 interface GitHubGraphQLResponse {
@@ -42,18 +43,23 @@ interface GitHubProjectCreateResponse {
 
 export class GitHubService {
 	private octokit: Octokit;
+	private username: string;
 
 	constructor(options: GitHubServiceOptions = {}) {
 		this.octokit = new Octokit({
-			auth: options.token,
+			auth: options.token || config.GITHUB_TOKEN,
 			baseUrl: config.GITHUB_API_URL,
 		});
+		this.username = options.username || config.GITHUB_USERNAME;
 	}
 
 	/**
 	 * Get projects for a user or organization
 	 */
-	async getProjects(owner: string): Promise<Project[]> {
+	async getProjects(owner?: string): Promise<Project[]> {
+		// Use the configured username if owner is not provided
+		const targetOwner = owner || this.username;
+
 		// Note: Using GraphQL API for Projects v2
 		const response = await this.octokit.graphql<GitHubGraphQLResponse>(
 			`
@@ -73,7 +79,7 @@ export class GitHubService {
       }
     `,
 			{
-				owner,
+				owner: targetOwner,
 			},
 		);
 
@@ -85,7 +91,7 @@ export class GitHubService {
 			description: node.shortDescription || "",
 			createdAt: node.createdAt,
 			updatedAt: node.updatedAt,
-			owner,
+			owner: targetOwner,
 			status: node.closed ? ProjectStatus.ARCHIVED : ProjectStatus.ACTIVE,
 			iterations: [], // Would need an additional API call to get iterations
 		}));
@@ -95,10 +101,12 @@ export class GitHubService {
 	 * Create a new project
 	 */
 	async createProject(
-		owner: string,
 		title: string,
 		description: string,
+		owner?: string,
 	): Promise<Project> {
+		const targetOwner = owner || this.username;
+
 		const response = await this.octokit.graphql<GitHubProjectCreateResponse>(
 			`
       mutation($owner: String!, $title: String!, $description: String!) {
@@ -121,7 +129,7 @@ export class GitHubService {
       }
     `,
 			{
-				owner,
+				owner: targetOwner,
 				title,
 				description,
 			},
@@ -134,7 +142,7 @@ export class GitHubService {
 			description: projectData.shortDescription || "",
 			createdAt: projectData.createdAt,
 			updatedAt: projectData.updatedAt,
-			owner,
+			owner: targetOwner,
 			status: projectData.closed
 				? ProjectStatus.ARCHIVED
 				: ProjectStatus.ACTIVE,

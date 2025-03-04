@@ -45,9 +45,9 @@ Make sure the total story points are achievable within the Sprint timeframe.
 		name: "Update ticket status",
 		description: "Move a ticket to a different stage in the workflow",
 		template: `
-Update the status of issue #{{issueNumber}} in repository {{owner}}/{{repo}} to {{status}}.
+              Update the status of issue #{{issueNumber}} in repository {{owner}}/{{repo}} to {{status}}.
 
-Use the 'update-issue-status' tool to change the status.
+              Use the 'update-issue-status' tool to change the status.
 `,
 	},
 };
@@ -162,30 +162,8 @@ export async function createMCPServer(authToken?: string) {
 		return {
 			tools: [
 				{
-					name: "calculate_sum",
-					description: "Add two numbers together",
-					inputSchema: {
-						type: "object",
-						properties: {
-							a: { type: "number" },
-							b: { type: "number" },
-						},
-						required: ["a", "b"],
-					},
-				},
-				{
 					name: "list-projects",
-					description: "List all projects for a user or organization",
-					inputSchema: {
-						type: "object",
-						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
-						},
-						required: ["owner"],
-					},
+					description: "List all projects for a user",
 				},
 				{
 					name: "create-project",
@@ -193,10 +171,6 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
 							title: {
 								type: "string",
 								description: "Title of the project",
@@ -215,10 +189,6 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
 							projectId: {
 								type: "string",
 								description: "ID of the project",
@@ -245,10 +215,6 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
 							repo: {
 								type: "string",
 								description: "Repository name",
@@ -263,10 +229,6 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
 							repo: {
 								type: "string",
 								description: "Repository name",
@@ -297,7 +259,7 @@ export async function createMCPServer(authToken?: string) {
 								description: "Story points for the issue",
 							},
 						},
-						required: ["owner", "repo", "title"],
+						required: ["repo", "title"],
 					},
 				},
 				{
@@ -306,10 +268,6 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
-							owner: {
-								type: "string",
-								description: "GitHub username or organization name",
-							},
 							repo: {
 								type: "string",
 								description: "Repository name",
@@ -325,7 +283,7 @@ export async function createMCPServer(authToken?: string) {
 								enum: ["backlog", "todo", "in_progress", "in_review", "done"],
 							},
 						},
-						required: ["owner", "repo", "issueNumber", "status"],
+						required: ["repo", "issueNumber", "status"],
 					},
 				},
 			],
@@ -334,23 +292,7 @@ export async function createMCPServer(authToken?: string) {
 
 	// Handle tool execution
 	server.setRequestHandler(CallToolRequestSchema, async (request) => {
-		if (request.params.name === "calculate_sum") {
-			const args = request.params.arguments || {};
-			const a = args.a as number;
-			const b = args.b as number;
-			return {
-				content: [
-					{
-						type: "text",
-						text: String(a + b),
-					},
-				],
-			};
-		}
-
 		if (request.params.name === "list-projects") {
-			const args = request.params.arguments || {};
-			const owner = args.owner as string;
 			try {
 				const projects = await projectResource.listProjects(owner);
 				return {
