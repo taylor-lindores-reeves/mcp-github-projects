@@ -1,5 +1,7 @@
 # GitHub Projects MCP Server
 
+[![smithery badge](https://smithery.ai/badge/mcp-github-projects)](https://smithery.ai/server/taylor-lindores-reeves/mcp-github-projects)
+
 An MCP (Model Context Protocol) server that enables AI agents to create and manage Agile Sprint-based projects using GitHub Projects.
 
 ## Features
@@ -18,6 +20,16 @@ An MCP (Model Context Protocol) server that enables AI agents to create and mana
 - MCP-compatible host (like Claude for Desktop)
 
 ## Installation
+
+### Installing via Smithery
+
+To install GitHub Projects MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/taylor-lindores-reeves/mcp-github-projects):
+
+```bash
+npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client claude
+```
+
+### Manual Installation
 
 1. Clone this repository:
    ```bash
