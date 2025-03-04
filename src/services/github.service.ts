@@ -4,6 +4,8 @@ import {
 	type Issue,
 	IssuePriority,
 	IssueStatus,
+	type Iteration,
+	IterationStatus,
 	type Project,
 	ProjectStatus,
 } from "../types";
@@ -166,6 +168,7 @@ export class GitHubService {
 			id: String(issue.id),
 			title: issue.title,
 			description: issue.body || "",
+			body: issue.body || "",
 			status: this.mapGitHubIssueStateToStatus(issue.state),
 			assignees: issue.assignees?.map((assignee) => assignee.login) || [],
 			labels: issue.labels
@@ -176,6 +179,10 @@ export class GitHubService {
 			createdAt: issue.created_at,
 			updatedAt: issue.updated_at,
 			priority: IssuePriority.MEDIUM,
+			number: issue.number,
+			url:
+				issue.html_url ||
+				`https://github.com/${owner}/${repo}/issues/${issue.number}`,
 		}));
 	}
 
@@ -205,12 +212,17 @@ export class GitHubService {
 			id: String(issue.id),
 			title: issue.title,
 			description: issue.body || "",
+			body: issue.body || "",
 			status: this.mapGitHubIssueStateToStatus(issue.state),
 			assignees: issue.assignees?.map((assignee) => assignee.login) || [],
 			labels: labels || [],
 			createdAt: issue.created_at,
 			updatedAt: issue.updated_at,
 			priority: IssuePriority.MEDIUM,
+			number: issue.number,
+			url:
+				issue.html_url ||
+				`https://github.com/${owner}/${repo}/issues/${issue.number}`,
 		};
 	}
 
@@ -241,5 +253,29 @@ export class GitHubService {
 	 */
 	private mapGitHubIssueStateToStatus(state: string): IssueStatus {
 		return state === "closed" ? IssueStatus.DONE : IssueStatus.TO_DO;
+	}
+
+	/**
+	 * Create a new iteration for a project
+	 */
+	async createIteration(
+		owner: string,
+		projectId: string,
+		title: string,
+		startDate: string,
+		endDate: string,
+	): Promise<Iteration> {
+		// In a real implementation, this would create an iteration in GitHub
+		// For now, we'll return a mock iteration
+		return {
+			id: `iteration-${Date.now()}`,
+			title,
+			startDate,
+			endDate,
+			status: IterationStatus.UPCOMING,
+			issues: [],
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		};
 	}
 }

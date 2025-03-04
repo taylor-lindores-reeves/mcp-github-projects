@@ -1,5 +1,6 @@
 import { GitHubService } from "../services/github.service";
-import type { Issue, IssuePriority, IssueStatus, MCPResource } from "../types";
+import type { Issue, IssueStatus, MCPResource } from "../types";
+import { IssuePriority } from "../types";
 
 /**
  * Format an Issue as an MCP Resource

@@ -1,5 +1,6 @@
 import { GitHubService } from "../services/github.service";
-import type { Iteration, IterationStatus, MCPResource } from "../types";
+import type { Iteration, MCPResource } from "../types";
+import { IterationStatus } from "../types";
 
 /**
  * Format an Iteration (Sprint) as an MCP Resource

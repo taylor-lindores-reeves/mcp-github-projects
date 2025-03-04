@@ -51,9 +51,9 @@ export class ProjectResource {
 	 * Create a new project
 	 */
 	async createProject(
+		owner: string,
 		title: string,
 		description: string,
-		owner?: string,
 	): Promise<MCPResource> {
 		try {
 			const project = await this.githubService.createProject(
@@ -87,6 +87,12 @@ export class ProjectResource {
 			"create-project": {
 				description: "Create a new project",
 				parameters: {
+					owner: {
+						type: "string",
+						description:
+							"GitHub username or organization name (defaults to GITHUB_USERNAME environment variable)",
+						required: true,
+					},
 					title: {
 						type: "string",
 						description: "Title of the project",
@@ -96,12 +102,6 @@ export class ProjectResource {
 						type: "string",
 						description: "Description of the project",
 						required: true,
-					},
-					owner: {
-						type: "string",
-						description:
-							"GitHub username or organization name (defaults to GITHUB_USERNAME environment variable)",
-						required: false,
 					},
 				},
 			},

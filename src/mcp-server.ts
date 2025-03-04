@@ -171,6 +171,10 @@ export async function createMCPServer(authToken?: string) {
 					inputSchema: {
 						type: "object",
 						properties: {
+							owner: {
+								type: "string",
+								description: "GitHub username or organization name",
+							},
 							title: {
 								type: "string",
 								description: "Title of the project",
@@ -294,6 +298,8 @@ export async function createMCPServer(authToken?: string) {
 	server.setRequestHandler(CallToolRequestSchema, async (request) => {
 		if (request.params.name === "list-projects") {
 			try {
+				const args = request.params.arguments || {};
+				const owner = typeof args.owner === "string" ? args.owner : undefined;
 				const projects = await projectResource.listProjects(owner);
 				return {
 					content: [
@@ -311,9 +317,15 @@ export async function createMCPServer(authToken?: string) {
 
 		if (request.params.name === "create-project") {
 			const args = request.params.arguments || {};
-			const owner = args.owner as string;
-			const title = args.title as string;
-			const description = (args.description as string) || "";
+			const owner = typeof args.owner === "string" ? args.owner : "";
+			const title = typeof args.title === "string" ? args.title : "";
+			const description =
+				typeof args.description === "string" ? args.description : "";
+
+			// Validate required parameters
+			if (!owner) throw new Error("Missing required parameter: owner");
+			if (!title) throw new Error("Missing required parameter: title");
+
 			try {
 				const project = await projectResource.createProject(
 					owner,
@@ -336,11 +348,21 @@ export async function createMCPServer(authToken?: string) {
 
 		if (request.params.name === "create-iteration") {
 			const args = request.params.arguments || {};
-			const owner = args.owner as string;
-			const projectId = args.projectId as string;
-			const title = args.title as string;
-			const startDate = args.startDate as string;
-			const endDate = args.endDate as string;
+			const owner = typeof args.owner === "string" ? args.owner : "";
+			const projectId =
+				typeof args.projectId === "string" ? args.projectId : "";
+			const title = typeof args.title === "string" ? args.title : "";
+			const startDate =
+				typeof args.startDate === "string" ? args.startDate : "";
+			const endDate = typeof args.endDate === "string" ? args.endDate : "";
+
+			// Validate required parameters
+			if (!owner) throw new Error("Missing required parameter: owner");
+			if (!projectId) throw new Error("Missing required parameter: projectId");
+			if (!title) throw new Error("Missing required parameter: title");
+			if (!startDate) throw new Error("Missing required parameter: startDate");
+			if (!endDate) throw new Error("Missing required parameter: endDate");
+
 			try {
 				const iteration = await iterationResource.createIteration(
 					owner,
@@ -365,8 +387,13 @@ export async function createMCPServer(authToken?: string) {
 
 		if (request.params.name === "list-issues") {
 			const args = request.params.arguments || {};
-			const owner = args.owner as string;
-			const repo = args.repo as string;
+			const owner = typeof args.owner === "string" ? args.owner : "";
+			const repo = typeof args.repo === "string" ? args.repo : "";
+
+			// Validate required parameters
+			if (!owner) throw new Error("Missing required parameter: owner");
+			if (!repo) throw new Error("Missing required parameter: repo");
+
 			try {
 				const issues = await issueResource.listIssues(owner, repo);
 				return {
@@ -385,13 +412,23 @@ export async function createMCPServer(authToken?: string) {
 
 		if (request.params.name === "create-issue") {
 			const args = request.params.arguments || {};
-			const owner = args.owner as string;
-			const repo = args.repo as string;
-			const title = args.title as string;
-			const description = (args.description as string) || "";
-			const labels = (args.labels as string[]) || [];
-			const priority = (args.priority as IssuePriority) || "medium";
-			const points = args.points as number;
+			const owner = typeof args.owner === "string" ? args.owner : "";
+			const repo = typeof args.repo === "string" ? args.repo : "";
+			const title = typeof args.title === "string" ? args.title : "";
+			const description =
+				typeof args.description === "string" ? args.description : "";
+			const labels = Array.isArray(args.labels) ? args.labels : [];
+			const priority =
+				typeof args.priority === "string"
+					? (args.priority as IssuePriority)
+					: "medium";
+			const points = typeof args.points === "number" ? args.points : undefined;
+
+			// Validate required parameters
+			if (!owner) throw new Error("Missing required parameter: owner");
+			if (!repo) throw new Error("Missing required parameter: repo");
+			if (!title) throw new Error("Missing required parameter: title");
+
 			try {
 				const issue = await issueResource.createIssue(
 					owner,
@@ -418,10 +455,20 @@ export async function createMCPServer(authToken?: string) {
 
 		if (request.params.name === "update-issue-status") {
 			const args = request.params.arguments || {};
-			const owner = args.owner as string;
-			const repo = args.repo as string;
-			const issueNumber = args.issueNumber as number;
-			const status = args.status as IssueStatus;
+			const owner = typeof args.owner === "string" ? args.owner : "";
+			const repo = typeof args.repo === "string" ? args.repo : "";
+			const issueNumber =
+				typeof args.issueNumber === "number" ? args.issueNumber : 0;
+			const status =
+				typeof args.status === "string" ? (args.status as IssueStatus) : "todo";
+
+			// Validate required parameters
+			if (!owner) throw new Error("Missing required parameter: owner");
+			if (!repo) throw new Error("Missing required parameter: repo");
+			if (!issueNumber)
+				throw new Error("Missing required parameter: issueNumber");
+			if (!status) throw new Error("Missing required parameter: status");
+
 			try {
 				await issueResource.updateIssueStatus(owner, repo, issueNumber, status);
 				return {

@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { IterationResource } from "../src/resources/iteration.resource";
 import type { GitHubService } from "../src/services/github.service";
-import type { Iteration, MCPResource } from "../src/types";
+import {
+	type Iteration,
+	IterationStatus,
+	type MCPResource,
+} from "../src/types";
 import { isTestEnabled, logTestInfo, testConfig } from "./test-config";
 import {
 	callApi,
@@ -92,17 +96,21 @@ describe("GitHub Iterations API", () => {
 				title: iterationTitle,
 				startDate: startDate,
 				endDate: endDate,
+				status: IterationStatus.UPCOMING,
+				issues: [],
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			};
 
-			console.log(`\nCreated iteration (dry run): ${createdIteration.title}`);
-			console.log(`ID: ${createdIteration.id}`);
-			console.log(
-				`Duration: ${createdIteration.startDate} to ${createdIteration.endDate}`,
-			);
+			if (createdIteration) {
+				console.log(`\nCreated iteration (dry run): ${createdIteration.title}`);
+				console.log(`ID: ${createdIteration.id}`);
+				console.log(
+					`Duration: ${createdIteration.startDate} to ${createdIteration.endDate}`,
+				);
 
-			expect(createdIteration.title).toBe(iterationTitle);
+				expect(createdIteration.title).toBe(iterationTitle);
+			}
 		} else {
 			createdIteration = await callApi(
 				githubService.createIteration.bind(githubService),

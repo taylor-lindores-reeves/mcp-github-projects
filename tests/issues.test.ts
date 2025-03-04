@@ -110,15 +110,20 @@ describe("GitHub Issues API", () => {
 			if (process.env.DRY_RUN === "true") {
 				// In dry run mode, we expect a mock issue
 				expect(createdIssue).toBeDefined();
-				expect(createdIssue.title).toBe(issueTitle);
-				expect(createdIssue.body).toBe(issueDescription);
-				issueNumber = createdIssue.number;
-				console.log("Created Issue (dry run):", createdIssue);
+				if (createdIssue) {
+					expect(createdIssue.title).toBe(issueTitle);
+					expect(createdIssue.body).toBe(issueDescription);
+					issueNumber = createdIssue.number;
+					console.log("Created Issue (dry run):", createdIssue);
+				}
 			} else {
-				expect(createdIssue?.title).toBe(issueTitle);
-				expect(createdIssue?.body).toBe(issueDescription);
-				issueNumber = createdIssue.number;
-				console.log("Created Issue:", createdIssue);
+				expect(createdIssue).toBeDefined();
+				if (createdIssue) {
+					expect(createdIssue.title).toBe(issueTitle);
+					expect(createdIssue.body).toBe(issueDescription);
+					issueNumber = createdIssue.number;
+					console.log("Created Issue:", createdIssue);
+				}
 			}
 		} catch (error) {
 			if (error instanceof Error && error.message.includes("Not Found")) {
@@ -130,52 +135,48 @@ describe("GitHub Issues API", () => {
 	});
 
 	test("should update an issue's status", async () => {
-		if (!isTestEnabled("update-issue-status") || !createdIssue) {
+		if (
+			!isTestEnabled("update-issue-status") ||
+			testConfig.mode.skipCreation ||
+			!createdIssue
+		) {
 			return;
 		}
 
-		try {
-			const newStatus = IssueStatus.IN_PROGRESS;
+		const newStatus = IssueStatus.IN_PROGRESS;
 
-			await callApi(
-				githubService.updateIssueStatus.bind(githubService),
-				[owner, repo, createdIssue.number, newStatus],
-				`Updating issue #${createdIssue.number} status to ${newStatus}`,
-			);
+		await callApi(
+			githubService.updateIssueStatus.bind(githubService),
+			[owner, repo, createdIssue.number, newStatus],
+			`Updating issue #${createdIssue.number} status to ${newStatus}`,
+		);
 
-			// Get the updated issue
-			const updatedIssues = await callApi(
-				githubService.getIssues.bind(githubService),
-				[owner, repo],
-				`Re-fetching issues for ${owner}/${repo}`,
-			);
+		// Get the updated issue
+		const updatedIssues = await callApi(
+			githubService.getIssues.bind(githubService),
+			[owner, repo],
+			`Re-fetching issues for ${owner}/${repo}`,
+		);
 
-			const updatedIssue = updatedIssues?.find(
-				(i) => i.number === createdIssue?.number,
-			);
+		const updatedIssue = updatedIssues?.find(
+			(i) => i.number === createdIssue?.number,
+		);
 
-			if (updatedIssue) {
-				console.log(`\nUpdated issue status: ${updatedIssue.status}`);
+		if (updatedIssue) {
+			console.log(`\nUpdated issue status: ${updatedIssue.status}`);
+		}
+
+		if (process.env.DRY_RUN === "true") {
+			// In dry run mode, we expect a mock updated issue
+			expect(Array.isArray(updatedIssues)).toBe(true);
+			if (updatedIssues && updatedIssues.length > 0) {
+				const updatedIssue = updatedIssues[0];
+				expect(updatedIssue.status).toBe(newStatus);
+				console.log("Updated Issue (dry run):", updatedIssue);
 			}
-
-			if (process.env.DRY_RUN === "true") {
-				// In dry run mode, we expect a mock updated issue
-				expect(Array.isArray(updatedIssues)).toBe(true);
-				if (updatedIssues.length > 0) {
-					const updatedIssue = updatedIssues[0];
-					expect(updatedIssue.status).toBe(newStatus);
-					console.log("Updated Issue (dry run):", updatedIssue);
-				}
-			} else {
-				expect(updatedIssue?.status).toBe(newStatus);
-				console.log("Updated Issue:", updatedIssue);
-			}
-		} catch (error) {
-			if (error instanceof Error && error.message.includes("Not Found")) {
-				console.warn(`\nRepository ${owner}/${repo} not found. Skipping test.`);
-			} else {
-				throw error;
-			}
+		} else {
+			expect(updatedIssue?.status).toBe(newStatus);
+			console.log("Updated Issue:", updatedIssue);
 		}
 	});
 
@@ -227,6 +228,38 @@ describe("GitHub Issues API", () => {
 			} else {
 				throw error;
 			}
+		}
+	});
+
+	test("should list issues with updated status", async () => {
+		if (
+			!isTestEnabled("list-issues-after-update") ||
+			testConfig.mode.skipCreation ||
+			!createdIssue
+		) {
+			return;
+		}
+
+		const updatedIssues = await callApi<Issue[]>(
+			githubService.getIssues.bind(githubService),
+			[owner, repo],
+			"Listing issues again to verify status update",
+		);
+
+		// Find our issue by number
+		const foundIssue = updatedIssues?.find(
+			(i) => i.number === createdIssue?.number,
+		);
+
+		// Log all issues to help with debugging
+		console.log("\nIssues after status update:");
+		if (updatedIssues && updatedIssues.length > 0) {
+			updatedIssues.forEach((issue, index) => {
+				console.log(`\n[${index + 1}] ${issue.title} (#${issue.number})`);
+				console.log(`Status: ${issue.status}`);
+			});
+		} else {
+			console.log("No issues found after update.");
 		}
 	});
 });

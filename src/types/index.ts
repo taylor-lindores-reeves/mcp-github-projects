@@ -24,6 +24,8 @@ export interface Iteration {
 	endDate: string;
 	status: IterationStatus;
 	issues: Issue[];
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export interface Issue {
@@ -37,6 +39,9 @@ export interface Issue {
 	updatedAt: string;
 	priority: IssuePriority;
 	points?: number;
+	number: number;
+	body: string;
+	url: string;
 }
 
 // Enums (implemented as constant maps for TypeScript best practices)
