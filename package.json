@@ -1,0 +1,49 @@
+{
+  "name": "mcp-github-projects",
+  "version": "1.0.0",
+  "description": "MCP server for creating and managing Agile Sprint-based projects with GitHub Projects",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "dev": "bun --watch src/cli.ts",
+    "build": "bun build ./index.ts --outdir ./dist",
+    "lint": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "octokit": "^4.1.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.4",
+    "typescript": "^5.8.2"
+  },
+  "keywords": [
+    "mcp",
+    "github",
+    "projects",
+    "agile",
+    "sprint",
+    "ai",
+    "agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/mcp-github-projects"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  }
+}
