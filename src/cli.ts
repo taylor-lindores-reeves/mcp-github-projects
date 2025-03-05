@@ -20,11 +20,9 @@ async function main() {
 				"Set the GITHUB_TOKEN environment variable to enable all features.",
 			);
 		}
-
-		console.log("Starting GitHub Projects MCP Server...");
 		try {
-      await createMCPServer(githubToken);
-			console.log("MCP Server is running. Press Ctrl+C to stop.");
+			await createMCPServer(githubToken);
+			console.error("MCP Server is running. Press Ctrl+C to stop.");
 		} catch (error) {
 			console.error("Failed to start MCP Server:", error);
 			process.exit(1);
@@ -39,7 +37,7 @@ async function main() {
 }
 
 function printHelp() {
-	console.log(`
+	console.error(`
 GitHub Projects MCP Server
 
 USAGE:

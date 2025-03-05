@@ -164,6 +164,16 @@ export async function createMCPServer(authToken?: string) {
 				{
 					name: "list-projects",
 					description: "List all projects for a user",
+					inputSchema: {
+						type: "object",
+						properties: {
+							owner: {
+								type: "string",
+								description: "GitHub username or organization name",
+							},
+						},
+						required: ["owner"],
+					},
 				},
 				{
 					name: "create-project",
@@ -501,9 +511,7 @@ if (require.main === module) {
 	const githubToken = process.env.GITHUB_TOKEN;
 
 	createMCPServer(githubToken)
-		.then(() => {
-			console.log("MCP Server started successfully");
-		})
+		.then(() => {})
 		.catch((error) => {
 			console.error("Failed to start MCP Server:", error);
 			process.exit(1);
