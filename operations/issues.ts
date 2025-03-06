@@ -2,14 +2,14 @@ import { z } from "zod";
 import { GitHubClient } from "./github-client.js";
 
 // Schema definitions for tool input validation
-export const GetIssueSchema = z.object({
-	owner: z.string().describe("Repository owner (username or organization)"),
+export const GetIssueSchema = {
+	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	issueNumber: z.number().describe("Issue number"),
-});
+};
 
-export const ListIssuesSchema = z.object({
-	owner: z.string().describe("Repository owner (username or organization)"),
+export const ListIssuesSchema = {
+	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	state: z
 		.enum(["open", "closed", "all"])
@@ -38,20 +38,20 @@ export const ListIssuesSchema = z.object({
 		.describe("Items per page (max 100)")
 		.default(30),
 	page: z.number().optional().describe("Page number").default(1),
-});
+};
 
-export const CreateIssueSchema = z.object({
-	owner: z.string().describe("Repository owner (username or organization)"),
+export const CreateIssueSchema = {
+	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	title: z.string().describe("Issue title"),
 	body: z.string().optional().describe("Issue body/description"),
 	assignees: z.array(z.string()).optional().describe("Usernames to assign"),
 	milestone: z.number().optional().describe("Milestone ID"),
 	labels: z.array(z.string()).optional().describe("Labels to apply"),
-});
+};
 
-export const UpdateIssueSchema = z.object({
-	owner: z.string().describe("Repository owner (username or organization)"),
+export const UpdateIssueSchema = {
+	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	issueNumber: z.number().describe("Issue number"),
 	title: z.string().optional().describe("New title"),
@@ -73,7 +73,17 @@ export const UpdateIssueSchema = z.object({
 		.nullable()
 		.optional()
 		.describe("Milestone ID (null to clear)"),
-});
+};
+
+const GetIssueZodObject = z.object(GetIssueSchema);
+const UpdateIssueZodObject = z.object(UpdateIssueSchema);
+const CreateIssueZodObject = z.object(CreateIssueSchema);
+const ListIssuesZodObject = z.object(ListIssuesSchema);
+
+type GetIssueParams = z.infer<typeof GetIssueZodObject>;
+type UpdateIssueParams = z.infer<typeof UpdateIssueZodObject>;
+type CreateIssueParams = z.infer<typeof CreateIssueZodObject>;
+type ListIssuesParams = z.infer<typeof ListIssuesZodObject>;
 
 export class IssueOperations {
 	private client: GitHubClient;
@@ -85,7 +95,7 @@ export class IssueOperations {
 	/**
 	 * Get an issue by owner, repo, and issue number
 	 */
-	async getIssue(params: z.infer<typeof GetIssueSchema>) {
+	async getIssue(params: GetIssueParams) {
 		const { owner, repo, issueNumber } = params;
 		const query = `
       query GetIssue($owner: String!, $name: String!, $number: Int!) {
@@ -179,7 +189,7 @@ export class IssueOperations {
 	/**
 	 * List issues for a repository
 	 */
-	async listIssues(params: z.infer<typeof ListIssuesSchema>) {
+	async listIssues(params: ListIssuesParams) {
 		const {
 			owner,
 			repo,
@@ -195,12 +205,12 @@ export class IssueOperations {
 
 		// Use REST API for this operation as it has better filtering options
 		const path = `/repos/${owner}/${repo}/issues`;
-		const queryParams: Record<string, string> = {
+		const queryParams: Record<string, string | undefined> = {
 			state,
 			sort,
 			direction,
-			per_page: per_page.toString(),
-			page: page.toString(),
+			per_page: per_page?.toString(),
+			page: page?.toString(),
 		};
 
 		if (labels && labels.length > 0) {
@@ -217,7 +227,7 @@ export class IssueOperations {
 
 		// Build the query string
 		const queryString = Object.entries(queryParams)
-			.map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+			.map(([key, value]) => `${key}=${encodeURIComponent(value ?? "")}`)
 			.join("&");
 
 		const result = await this.client.rest<
@@ -259,7 +269,7 @@ export class IssueOperations {
 	/**
 	 * Create a new issue
 	 */
-	async createIssue(params: z.infer<typeof CreateIssueSchema>) {
+	async createIssue(params: CreateIssueParams) {
 		const { owner, repo, title, body, assignees, milestone, labels } = params;
 		const path = `/repos/${owner}/${repo}/issues`;
 
@@ -298,7 +308,7 @@ export class IssueOperations {
 	/**
 	 * Update an existing issue
 	 */
-	async updateIssue(params: z.infer<typeof UpdateIssueSchema>) {
+	async updateIssue(params: UpdateIssueParams) {
 		const {
 			owner,
 			repo,

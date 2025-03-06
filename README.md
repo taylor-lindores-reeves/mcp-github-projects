@@ -64,12 +64,12 @@ The MCP server exposes the following tools:
 ### Repositories
 
 - **get-repository**: Get a GitHub repository by owner and name
-- **list-repositories**: List repositories for a user or organization
+- **list-repositories**: List repositories for a user
 
 ### Projects
 
 - **get-project**: Get a GitHub Project by ID
-- **list-projects**: List GitHub Projects for a user or organization
+- **list-projects**: List GitHub Projects for a user
 - **get-project-columns**: Get status columns for a GitHub Project
 - **get-project-fields**: Get fields for a GitHub Project
 - **get-project-items**: Get items (issues) from a GitHub Project

@@ -6,8 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
-    "build": "tsc",
-    "lint": "eslint . --ext .ts"
+    "build": "tsc"
   },
   "keywords": [
     "github",
@@ -21,19 +20,12 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
-    "node-fetch": "^3.3.2",
-    "zod": "^3.22.4",
-    "zod-to-json-schema": "^3.22.4"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
-    "@types/node-fetch": "^2.6.11",
-    "@typescript-eslint/eslint-plugin": "^6.17.0",
-    "@typescript-eslint/parser": "^6.17.0",
-    "eslint": "^8.56.0",
     "typescript": "^5.8.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=23.9.0"
   }
 }

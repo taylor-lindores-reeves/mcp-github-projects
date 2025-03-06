@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { createGitHubError } from "../common/errors.js";
 import config from "../config.js";
 

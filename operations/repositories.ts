@@ -2,13 +2,13 @@ import { z } from "zod";
 import { GitHubClient } from "./github-client.js";
 
 // Schema definitions for tool input validation
-export const GetRepositorySchema = z.object({
-	owner: z.string().describe("Repository owner (username or organization)"),
+export const GetRepositorySchema = {
+	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
-});
+};
 
-export const ListRepositoriesSchema = z.object({
-	owner: z.string().describe("Username or organization name"),
+export const ListRepositoriesSchema = {
+	owner: z.string().describe("Username"),
 	type: z
 		.enum(["all", "owner", "public", "private", "member"])
 		.optional()
@@ -30,8 +30,13 @@ export const ListRepositoriesSchema = z.object({
 		.describe("Items per page (max 100)")
 		.default(30),
 	page: z.number().optional().describe("Page number").default(1),
-});
+};
 
+const GetRepositoryZodObject = z.object(GetRepositorySchema);
+const ListRepositoriesZodObject = z.object(ListRepositoriesSchema);
+
+type GetRepositoryParams = z.infer<typeof GetRepositoryZodObject>;
+type ListRepositoriesParams = z.infer<typeof ListRepositoriesZodObject>;
 export class RepositoryOperations {
 	private client: GitHubClient;
 
@@ -42,7 +47,7 @@ export class RepositoryOperations {
 	/**
 	 * Get a repository by owner and name
 	 */
-	async getRepository(params: z.infer<typeof GetRepositorySchema>) {
+	async getRepository(params: GetRepositoryParams) {
 		const query = `
       query GetRepository($owner: String!, $name: String!) {
         repository(owner: $owner, name: $name) {
@@ -133,27 +138,25 @@ export class RepositoryOperations {
 	}
 
 	/**
-	 * List repositories for a user or organization
+	 * List repositories for a user
 	 */
-	async listRepositories(params: z.infer<typeof ListRepositoriesSchema>) {
+	async listRepositories(params: ListRepositoriesParams) {
 		const { owner, type, sort, direction, per_page, page } = params;
 
 		// Use REST API for this operation as it provides better pagination and filtering
-		const path = owner.includes("/")
-			? `/orgs/${owner}/repos`
-			: `/users/${owner}/repos`;
+		const path = `/users/${owner}/repos`;
 
-		const queryParams: Record<string, string> = {
+		const queryParams: Record<string, string | undefined> = {
 			type,
 			sort,
 			direction,
-			per_page: per_page.toString(),
-			page: page.toString(),
+			per_page: per_page?.toString(),
+			page: page?.toString(),
 		};
 
 		// Build the query string
 		const queryString = Object.entries(queryParams)
-			.map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+			.map(([key, value]) => `${key}=${encodeURIComponent(value ?? "")}`)
 			.join("&");
 
 		const result = await this.client.rest<
