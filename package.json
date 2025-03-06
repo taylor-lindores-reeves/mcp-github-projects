@@ -1,53 +1,39 @@
 {
-  "name": "mcp-github-projects",
+  "name": "github-api-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for creating and managing Agile Sprint-based projects with GitHub Projects",
-  "module": "index.ts",
+  "description": "MCP server for GitHub API with Agile project management features",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "bun run src/cli.ts",
-    "dev": "bun --watch src/cli.ts",
-    "build": "bun build ./index.ts --outdir ./dist",
-    "lint": "tsc --noEmit",
-    "test": "bun test",
-    "test:mcp": "bun run src/test-mcp-server.ts",
-    "test:github": "bun test tests/index.test.ts",
-    "test:github:dry": "DRY_RUN=true bun test tests/index.test.ts",
-    "test:github:projects": "RUN_ONLY_TESTS=list-projects,create-project bun test tests/projects.test.ts"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.9",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "helmet": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "octokit": "^4.1.2",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.2.4",
-    "typescript": "^5.8.2"
+    "start": "bun run index.ts",
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
   },
   "keywords": [
-    "mcp",
     "github",
-    "projects",
+    "api",
+    "mcp",
     "agile",
     "sprint",
-    "ai",
-    "agent"
+    "project management"
   ],
   "author": "",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/mcp-github-projects"
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "node-fetch": "^3.3.2",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/node-fetch": "^2.6.11",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.8.2"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "bun": ">=1.0.0"
+    "node": ">=18.0.0"
   }
 }

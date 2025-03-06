@@ -1,124 +1,128 @@
 # GitHub Projects MCP Server
 
-An MCP (Model Context Protocol) server that enables AI agents to create and manage Agile Sprint-based projects using GitHub Projects.
+A TypeScript server implementing the Model Context Protocol (MCP) to interact with GitHub's Projects v2 API for Agile project management.
 
 ## Features
 
-- **Project Management**: Create and manage GitHub Projects
-- **Sprint Planning**: Define iterations (sprints) with start and end dates
-- **Issue Tracking**: Create and update issues with Agile-focused metadata
-- **Workflow Automation**: Move tickets through different stages of your workflow
-- **AI-Friendly Interface**: Designed to work seamlessly with AI agents like Claude
+- **GitHub Projects v2 API**: Full support for GitHub's GraphQL Projects v2 API
+- **GitHub Issues**: Create, read, and update GitHub issues
+- **GitHub Repositories**: Fetch repository details
+- **Error Handling**: Comprehensive error handling for all GitHub API interactions
+- **Type Safety**: Built with TypeScript and Zod for maximum type safety
 
-## Prerequisites
+## Directory Structure
 
-- [Bun.js](https://bun.sh/) (v1.0.0+)
-- [Node.js](https://nodejs.org/) (v18+)
-- GitHub account with a Personal Access Token (PAT)
-- MCP-compatible host (like Claude for Desktop)
+```
+.
+├── common/
+│   └── errors.ts          # Error handling for GitHub API
+├── operations/
+│   ├── github-client.ts   # GitHub API client for GraphQL and REST
+│   ├── issues.ts          # GitHub Issues operations
+│   ├── projects.ts        # GitHub Projects v2 operations
+│   ├── repositories.ts    # GitHub Repository operations
+│   └── index.ts           # Operations exports
+├── index.ts               # Main server entry point
+├── config.ts              # Application configuration
+├── package.json
+└── README.md
+```
 
 ## Installation
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/mcp-github-projects.git
-   cd mcp-github-projects
-   ```
-
+1. Clone the repository
 2. Install dependencies:
-   ```bash
-   bun install
-   ```
+
+```bash
+bun install
+```
 
 3. Create a `.env` file with your GitHub token:
-   ```
-   GITHUB_TOKEN=your_github_personal_access_token
-   ```
+
+```
+GITHUB_TOKEN=your_github_personal_access_token
+```
 
 ## Usage
 
-### Starting the Server
-
-Run the server using Bun:
-
-```bash
-bun run src/cli.ts
-```
-
-Or use the npm script:
+### Start the server
 
 ```bash
 bun start
 ```
 
-### Connecting to Claude for Desktop
+For development with auto-reload:
 
-1. Open Claude for Desktop
-2. Go to Settings > MCP Servers
-3. Add a new server with the following configuration:
-   - Name: GitHub Projects
-   - Command: `bun`
-   - Arguments: `run ${path_to_project}/src/cli.ts`
-   - Environment Variables: Add your GitHub token as `GITHUB_TOKEN`
+```bash
+bun dev
+```
 
-### Available Tools
+## Available Tools
 
-- `list-projects`: List all projects for a user or organization
-- `create-project`: Create a new project
-- `create-iteration`: Create a new iteration (sprint)
-- `list-issues`: List all issues for a repository
-- `create-issue`: Create a new issue
-- `update-issue-status`: Update the status of an issue
+The MCP server exposes the following tools:
 
-### Example Prompts
+### Repositories
 
-The server provides helpful prompt templates for common Agile workflows:
+- **get-repository**: Get a GitHub repository by owner and name
+- **list-repositories**: List repositories for a user or organization
 
-- **Create Sprint**: Set up a new Sprint with a title and date range
-- **Plan Sprint**: Organize issues for an upcoming Sprint
-- **Move Ticket**: Update the status of an issue in the workflow
+### Projects
+
+- **get-project**: Get a GitHub Project by ID
+- **list-projects**: List GitHub Projects for a user or organization
+- **get-project-columns**: Get status columns for a GitHub Project
+- **get-project-fields**: Get fields for a GitHub Project
+- **get-project-items**: Get items (issues) from a GitHub Project
+- **create-project-item**: Add an issue or PR to a GitHub Project
+- **update-project-item-field**: Update a field value for a project item
+
+### Issues
+
+- **get-issue**: Get a GitHub issue by number
+- **list-issues**: List issues for a repository
+- **create-issue**: Create a new GitHub issue
+- **update-issue**: Update an existing GitHub issue
+
+## Environment Variables
+
+- `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate permissions
+- `PORT` (optional): Port to run the server on (default: 3000)
+- `NODE_ENV`: Environment mode (development, production, test)
+
+## GitHub Token Permissions
+
+The GitHub token requires the following permissions:
+
+- `repo` - Full control of private repositories
+- `project` - Full control of user projects
+- `read:org` - Read organization membership
 
 ## Development
 
-### Project Structure
+### Building
 
-```
-mcp-github-projects/
-├── src/
-│   ├── types/             # TypeScript type definitions
-│   ├── services/          # Service integrations (GitHub API)
-│   ├── resources/         # MCP resources
-│   ├── mcp-server.ts      # Main MCP server implementation
-│   └── cli.ts             # Command-line interface
-├── index.ts               # Entry point
-├── package.json           # Project metadata
-└── README.md              # This file
+```bash
+bun build
 ```
 
-### Adding New Features
+### Testing
 
-To add new tools or capabilities:
+```bash
+bun test
+```
 
-1. Update the appropriate service in `src/services/`
-2. Add a new resource handler in `src/resources/`
-3. Register the tool in `src/mcp-server.ts`
+## GitHub Projects v2 GraphQL API
 
-## Security Considerations
+This MCP server is built on top of GitHub's GraphQL API v2 for Projects. It uses the following GraphQL endpoints:
 
-- The server runs with the permissions of the provided GitHub token
-- All operations are performed through the GitHub API
-- No data is stored locally outside of the current session
-- Consider using a token with limited scope for production use
+- Projects Query: Fetch projects and project details
+- Project Field Query: Get field definitions from a project
+- Project Items Query: Get items within a project
+- Add Project Item Mutation: Add items to a project
+- Update Project Item Field Mutation: Update field values for project items
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+For more information on GitHub's GraphQL API, see the [official documentation](https://docs.github.com/en/graphql).
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- GitHub Projects API for providing the underlying project management capabilities
-- Model Context Protocol (MCP) for creating a standardized way to extend AI agent functionality
+MIT
