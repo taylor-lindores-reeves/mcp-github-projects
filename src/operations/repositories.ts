@@ -1,14 +1,18 @@
 import { z } from "zod";
+// Import GraphQL operations
+import { getRepository } from "../graphql/repositories/index.js";
+import type {
+	GetRepositoryQuery,
+	GetRepositoryQueryVariables,
+} from "../types/github-api-types.js";
 import { GitHubClient } from "./github-client.js";
 
 // Schema definitions for tool input validation
 export const GetRepositorySchema = {
-	owner: z.string().describe("Repository owner (username)"),
-	repo: z.string().describe("Repository name"),
+	name: z.string().describe("Repository name"),
 };
 
 export const ListRepositoriesSchema = {
-	owner: z.string().describe("Username"),
 	type: z
 		.enum(["all", "owner", "public", "private", "member"])
 		.optional()
@@ -32,107 +36,29 @@ export const ListRepositoriesSchema = {
 	page: z.number().optional().describe("Page number").default(1),
 };
 
-const GetRepositoryZodObject = z.object(GetRepositorySchema);
 const ListRepositoriesZodObject = z.object(ListRepositoriesSchema);
 
-type GetRepositoryParams = z.infer<typeof GetRepositoryZodObject>;
 type ListRepositoriesParams = z.infer<typeof ListRepositoriesZodObject>;
 export class RepositoryOperations {
 	private client: GitHubClient;
+	private owner: string;
 
 	constructor() {
 		this.client = new GitHubClient();
+		this.owner = process.env.GITHUB_OWNER as string;
 	}
 
 	/**
 	 * Get a repository by owner and name
 	 */
-	async getRepository(params: GetRepositoryParams) {
-		const query = `
-      query GetRepository($owner: String!, $name: String!) {
-        repository(owner: $owner, name: $name) {
-          id
-          name
-          owner {
-            login
-            url
-            avatarUrl
-          }
-          nameWithOwner
-          description
-          url
-          homepageUrl
-          primaryLanguage {
-            name
-            color
-          }
-          isPrivate
-          isFork
-          isArchived
-          isTemplate
-          stargazerCount
-          forkCount
-          watchers {
-            totalCount
-          }
-          openIssues: issues(states: OPEN) {
-            totalCount
-          }
-          defaultBranchRef {
-            name
-          }
-          createdAt
-          updatedAt
-          pushedAt
-          licenseInfo {
-            name
-            spdxId
-          }
-        }
-      }
-    `;
-
-		const result = await this.client.graphql<{
-			repository: {
-				id: string;
-				name: string;
-				owner: {
-					login: string;
-					url: string;
-					avatarUrl: string;
-				};
-				nameWithOwner: string;
-				description: string | null;
-				url: string;
-				homepageUrl: string | null;
-				primaryLanguage: {
-					name: string;
-					color: string;
-				} | null;
-				isPrivate: boolean;
-				isFork: boolean;
-				isArchived: boolean;
-				isTemplate: boolean;
-				stargazerCount: number;
-				forkCount: number;
-				watchers: {
-					totalCount: number;
-				};
-				openIssues: {
-					totalCount: number;
-				};
-				defaultBranchRef: {
-					name: string;
-				} | null;
-				createdAt: string;
-				updatedAt: string;
-				pushedAt: string;
-				licenseInfo: {
-					name: string;
-					spdxId: string;
-				} | null;
-			};
-		}>(query, { owner: params.owner, name: params.repo });
+	async getRepository(input: Omit<GetRepositoryQueryVariables, "owner">) {
+		const result = await this.client.graphql<
+			GetRepositoryQuery,
+			GetRepositoryQueryVariables
+		>(getRepository, {
+			...input,
+			owner: this.owner,
+		});
 
 		return result.repository;
 	}
@@ -141,10 +67,10 @@ export class RepositoryOperations {
 	 * List repositories for a user
 	 */
 	async listRepositories(params: ListRepositoriesParams) {
-		const { owner, type, sort, direction, per_page, page } = params;
+		const { type, sort, direction, per_page, page } = params;
 
 		// Use REST API for this operation as it provides better pagination and filtering
-		const path = `/users/${owner}/repos`;
+		const path = `/users/${this.owner}/repos`;
 
 		const queryParams: Record<string, string | undefined> = {
 			type,

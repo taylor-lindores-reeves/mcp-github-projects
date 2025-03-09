@@ -1,0 +1,5 @@
+mutation DeleteProjectV2Field($input: DeleteProjectV2FieldInput!) {
+	deleteProjectV2Field(input: $input) {
+		clientMutationId
+	}
+}

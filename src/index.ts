@@ -19,7 +19,6 @@ import {
 	ClearProjectV2ItemFieldValueSchema,
 	ConvertProjectV2DraftIssueToIssueSchema,
 	CopyProjectV2Schema,
-	CreateProjectItemSchema,
 	CreateProjectV2FieldSchema,
 	CreateProjectV2Schema,
 	DeleteProjectV2FieldSchema,
@@ -54,32 +53,6 @@ type GetProjectParams = typeof GetProjectSchema;
 type ListProjectsParams = typeof ListProjectsSchema;
 type GetProjectColumnsParams = typeof GetProjectColumnsSchema;
 type GetProjectFieldsParams = typeof GetProjectFieldsSchema;
-type GetProjectItemsParams = typeof GetProjectItemsSchema;
-type UpdateProjectItemFieldValueParams =
-	typeof UpdateProjectItemFieldValueSchema;
-type CreateProjectV2Params = typeof CreateProjectV2Schema;
-type UpdateProjectV2Params = typeof UpdateProjectV2Schema;
-type DeleteProjectV2Params = typeof DeleteProjectV2Schema;
-type CopyProjectV2Params = typeof CopyProjectV2Schema;
-type AddProjectV2DraftIssueParams = typeof AddProjectV2DraftIssueSchema;
-type ConvertProjectV2DraftIssueToIssueParams =
-	typeof ConvertProjectV2DraftIssueToIssueSchema;
-type AddProjectV2ItemByIdParams = typeof AddProjectV2ItemByIdSchema;
-type UpdateProjectV2ItemPositionParams =
-	typeof UpdateProjectV2ItemPositionSchema;
-type DeleteProjectV2ItemParams = typeof DeleteProjectV2ItemSchema;
-type CreateProjectV2FieldParams = typeof CreateProjectV2FieldSchema;
-type UpdateProjectV2FieldParams = typeof UpdateProjectV2FieldSchema;
-type DeleteProjectV2FieldParams = typeof DeleteProjectV2FieldSchema;
-type UpdateProjectV2StatusUpdateParams =
-	typeof UpdateProjectV2StatusUpdateSchema;
-type ArchiveProjectV2ItemParams = typeof ArchiveProjectV2ItemSchema;
-type UnarchiveProjectV2ItemParams = typeof UnarchiveProjectV2ItemSchema;
-type ClearProjectV2ItemFieldValueParams =
-	typeof ClearProjectV2ItemFieldValueSchema;
-type MarkProjectV2AsTemplateParams = typeof MarkProjectV2AsTemplateSchema;
-type UnmarkProjectV2AsTemplateParams = typeof UnmarkProjectV2AsTemplateSchema;
-type CreateProjectItemParams = typeof CreateProjectItemSchema;
 
 const server = new McpServer(
 	{
@@ -294,8 +267,8 @@ server.tool<GetProjectParams>(
 	"get-project",
 	"Get a GitHub Project by ID",
 	GetProjectSchema,
-	async (params) => {
-		const result = await projectOperations.getProject(params);
+	async (input) => {
+		const result = await projectOperations.getProject(input);
 		return {
 			content: [
 				{
@@ -358,7 +331,7 @@ server.tool<GetProjectFieldsParams>(
 	},
 );
 
-server.tool<GetProjectItemsParams>(
+server.tool(
 	"get-project-items",
 	"Get items (issues) from a GitHub Project",
 	GetProjectItemsSchema,
@@ -375,24 +348,7 @@ server.tool<GetProjectItemsParams>(
 	},
 );
 
-server.tool<CreateProjectItemParams>(
-	"create-project-item",
-	"Add an issue or PR to a GitHub Project",
-	CreateProjectItemSchema,
-	async (params) => {
-		const result = await projectOperations.createProjectItem(params);
-		return {
-			content: [
-				{
-					type: "text",
-					text: JSON.stringify(result, null, 2),
-				},
-			],
-		};
-	},
-);
-
-server.tool<UpdateProjectItemFieldValueParams>(
+server.tool(
 	"update-project-item-field",
 	"Update a field value for a project item",
 	UpdateProjectItemFieldValueSchema,
@@ -409,7 +365,7 @@ server.tool<UpdateProjectItemFieldValueParams>(
 	},
 );
 
-server.tool<CreateProjectV2Params>(
+server.tool(
 	"create-project",
 	"Create a new GitHub Project",
 	CreateProjectV2Schema,
@@ -426,7 +382,7 @@ server.tool<CreateProjectV2Params>(
 	},
 );
 
-server.tool<UpdateProjectV2Params>(
+server.tool(
 	"update-project",
 	"Update an existing GitHub Project",
 	UpdateProjectV2Schema,
@@ -443,7 +399,7 @@ server.tool<UpdateProjectV2Params>(
 	},
 );
 
-server.tool<DeleteProjectV2Params>(
+server.tool(
 	"delete-project",
 	"Delete a GitHub Project",
 	DeleteProjectV2Schema,
@@ -460,7 +416,7 @@ server.tool<DeleteProjectV2Params>(
 	},
 );
 
-server.tool<CopyProjectV2Params>(
+server.tool(
 	"copy-project",
 	"Copy a GitHub Project",
 	CopyProjectV2Schema,
@@ -477,7 +433,7 @@ server.tool<CopyProjectV2Params>(
 	},
 );
 
-server.tool<AddProjectV2DraftIssueParams>(
+server.tool(
 	"add-draft-issue",
 	"Add a draft issue to a GitHub Project",
 	AddProjectV2DraftIssueSchema,
@@ -494,7 +450,7 @@ server.tool<AddProjectV2DraftIssueParams>(
 	},
 );
 
-server.tool<ConvertProjectV2DraftIssueToIssueParams>(
+server.tool(
 	"convert-draft-issue",
 	"Convert a draft issue to a regular issue",
 	ConvertProjectV2DraftIssueToIssueSchema,
@@ -512,7 +468,7 @@ server.tool<ConvertProjectV2DraftIssueToIssueParams>(
 	},
 );
 
-server.tool<AddProjectV2ItemByIdParams>(
+server.tool(
 	"add-item-to-project",
 	"Add an existing issue or PR to a GitHub Project",
 	AddProjectV2ItemByIdSchema,
@@ -529,7 +485,7 @@ server.tool<AddProjectV2ItemByIdParams>(
 	},
 );
 
-server.tool<UpdateProjectV2ItemPositionParams>(
+server.tool(
 	"update-item-position",
 	"Update the position of an item in a GitHub Project",
 	UpdateProjectV2ItemPositionSchema,
@@ -546,7 +502,7 @@ server.tool<UpdateProjectV2ItemPositionParams>(
 	},
 );
 
-server.tool<DeleteProjectV2ItemParams>(
+server.tool(
 	"delete-project-item",
 	"Remove an item from a GitHub Project",
 	DeleteProjectV2ItemSchema,
@@ -563,7 +519,7 @@ server.tool<DeleteProjectV2ItemParams>(
 	},
 );
 
-server.tool<CreateProjectV2FieldParams>(
+server.tool(
 	"create-project-field",
 	"Create a new field in a GitHub Project",
 	CreateProjectV2FieldSchema,
@@ -580,7 +536,7 @@ server.tool<CreateProjectV2FieldParams>(
 	},
 );
 
-server.tool<UpdateProjectV2FieldParams>(
+server.tool(
 	"update-project-field",
 	"Update a field in a GitHub Project",
 	UpdateProjectV2FieldSchema,
@@ -597,7 +553,7 @@ server.tool<UpdateProjectV2FieldParams>(
 	},
 );
 
-server.tool<DeleteProjectV2FieldParams>(
+server.tool(
 	"delete-project-field",
 	"Delete a field from a GitHub Project",
 	DeleteProjectV2FieldSchema,
@@ -614,7 +570,7 @@ server.tool<DeleteProjectV2FieldParams>(
 	},
 );
 
-server.tool<UpdateProjectV2StatusUpdateParams>(
+server.tool(
 	"update-project-status",
 	"Update the status of a GitHub Project",
 	UpdateProjectV2StatusUpdateSchema,
@@ -631,7 +587,7 @@ server.tool<UpdateProjectV2StatusUpdateParams>(
 	},
 );
 
-server.tool<ArchiveProjectV2ItemParams>(
+server.tool(
 	"archive-project-item",
 	"Archive an item in a GitHub Project",
 	ArchiveProjectV2ItemSchema,
@@ -648,7 +604,7 @@ server.tool<ArchiveProjectV2ItemParams>(
 	},
 );
 
-server.tool<UnarchiveProjectV2ItemParams>(
+server.tool(
 	"unarchive-project-item",
 	"Unarchive an item in a GitHub Project",
 	UnarchiveProjectV2ItemSchema,
@@ -665,7 +621,7 @@ server.tool<UnarchiveProjectV2ItemParams>(
 	},
 );
 
-server.tool<ClearProjectV2ItemFieldValueParams>(
+server.tool(
 	"clear-item-field-value",
 	"Clear a field value for an item in a GitHub Project",
 	ClearProjectV2ItemFieldValueSchema,
@@ -682,7 +638,7 @@ server.tool<ClearProjectV2ItemFieldValueParams>(
 	},
 );
 
-server.tool<MarkProjectV2AsTemplateParams>(
+server.tool(
 	"mark-project-as-template",
 	"Mark a GitHub Project as a template",
 	MarkProjectV2AsTemplateSchema,
@@ -699,7 +655,7 @@ server.tool<MarkProjectV2AsTemplateParams>(
 	},
 );
 
-server.tool<UnmarkProjectV2AsTemplateParams>(
+server.tool(
 	"unmark-project-as-template",
 	"Unmark a GitHub Project as a template",
 	UnmarkProjectV2AsTemplateSchema,
@@ -784,12 +740,15 @@ server.tool<UpdateIssueParams>(
 	},
 );
 
-async function runServer() {
+/**
+ * Start the server using stdio transport.
+ * This allows the server to communicate via standard input/output streams.
+ */
+async function main() {
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
 }
-
-runServer().catch((error) => {
-	console.error("Fatal error in main():", error);
+main().catch((error) => {
+	console.error("Server error:", error);
 	process.exit(1);
 });

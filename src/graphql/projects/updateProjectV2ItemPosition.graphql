@@ -1,0 +1,7 @@
+mutation UpdateProjectV2ItemPosition(
+	$input: UpdateProjectV2ItemPositionInput!
+) {
+	updateProjectV2ItemPosition(input: $input) {
+		clientMutationId
+	}
+}

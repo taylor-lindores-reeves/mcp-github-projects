@@ -1,0 +1,8 @@
+mutation MarkProjectV2AsTemplate($input: MarkProjectV2AsTemplateInput!) {
+	markProjectV2AsTemplate(input: $input) {
+		projectV2 {
+			id
+			template
+		}
+	}
+}

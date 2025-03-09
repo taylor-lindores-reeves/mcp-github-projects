@@ -1,0 +1,95 @@
+query GetProjectItems($id: ID!, $first: Int, $after: String) {
+	node(id: $id) {
+		... on ProjectV2 {
+			items(first: $first, after: $after) {
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+				nodes {
+					id
+					type
+					fieldValues(first: 20) {
+						nodes {
+							__typename
+							... on ProjectV2ItemFieldTextValue {
+								text
+								field {
+									... on ProjectV2FieldCommon {
+										name
+										id
+									}
+								}
+							}
+							... on ProjectV2ItemFieldDateValue {
+								date
+								field {
+									... on ProjectV2FieldCommon {
+										name
+										id
+									}
+								}
+							}
+							... on ProjectV2ItemFieldSingleSelectValue {
+								name
+								field {
+									... on ProjectV2FieldCommon {
+										name
+										id
+									}
+								}
+							}
+							... on ProjectV2ItemFieldNumberValue {
+								number
+								field {
+									... on ProjectV2FieldCommon {
+										name
+										id
+									}
+								}
+							}
+							... on ProjectV2ItemFieldIterationValue {
+								title
+								startDate
+								duration
+								field {
+									... on ProjectV2FieldCommon {
+										name
+										id
+									}
+								}
+							}
+						}
+					}
+					content {
+						__typename
+						... on Issue {
+							id
+							title
+							number
+							url
+							repository {
+								name
+								owner {
+									login
+								}
+							}
+						}
+						... on PullRequest {
+							id
+							title
+							number
+							url
+							repository {
+								name
+								owner {
+									login
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

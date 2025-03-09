@@ -1,15 +1,19 @@
 import { z } from "zod";
+// Import GraphQL operations
+import { getIssue } from "../graphql/issues/index.js";
+import type {
+	GetIssueQuery,
+	GetIssueQueryVariables,
+} from "../types/github-api-types.js";
 import { GitHubClient } from "./github-client.js";
 
 // Schema definitions for tool input validation
 export const GetIssueSchema = {
-	owner: z.string().describe("Repository owner (username)"),
-	repo: z.string().describe("Repository name"),
-	issueNumber: z.number().describe("Issue number"),
+	name: z.string().describe("Repository name"),
+	number: z.number().describe("Issue number"),
 };
 
 export const ListIssuesSchema = {
-	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	state: z
 		.enum(["open", "closed", "all"])
@@ -41,7 +45,6 @@ export const ListIssuesSchema = {
 };
 
 export const CreateIssueSchema = {
-	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	title: z.string().describe("Issue title"),
 	body: z.string().optional().describe("Issue body/description"),
@@ -51,7 +54,6 @@ export const CreateIssueSchema = {
 };
 
 export const UpdateIssueSchema = {
-	owner: z.string().describe("Repository owner (username)"),
 	repo: z.string().describe("Repository name"),
 	issueNumber: z.number().describe("Issue number"),
 	title: z.string().optional().describe("New title"),
@@ -75,113 +77,38 @@ export const UpdateIssueSchema = {
 		.describe("Milestone ID (null to clear)"),
 };
 
-const GetIssueZodObject = z.object(GetIssueSchema);
 const UpdateIssueZodObject = z.object(UpdateIssueSchema);
 const CreateIssueZodObject = z.object(CreateIssueSchema);
 const ListIssuesZodObject = z.object(ListIssuesSchema);
 
-type GetIssueParams = z.infer<typeof GetIssueZodObject>;
 type UpdateIssueParams = z.infer<typeof UpdateIssueZodObject>;
 type CreateIssueParams = z.infer<typeof CreateIssueZodObject>;
 type ListIssuesParams = z.infer<typeof ListIssuesZodObject>;
 
 export class IssueOperations {
 	private client: GitHubClient;
+	private owner: string;
 
 	constructor() {
 		this.client = new GitHubClient();
+		this.owner = process.env.GITHUB_OWNER as string;
 	}
 
 	/**
-	 * Get an issue by owner, repo, and issue number
+	 * Get a specific issue by repository and issue number
 	 */
-	async getIssue(params: GetIssueParams) {
-		const { owner, repo, issueNumber } = params;
-		const query = `
-      query GetIssue($owner: String!, $name: String!, $number: Int!) {
-        repository(owner: $owner, name: $name) {
-          issue(number: $number) {
-            id
-            number
-            title
-            body
-            state
-            createdAt
-            updatedAt
-            closedAt
-            url
-            author {
-              login
-              url
-            }
-            assignees(first: 10) {
-              nodes {
-                login
-                url
-              }
-            }
-            labels(first: 10) {
-              nodes {
-                name
-                color
-              }
-            }
-            milestone {
-              title
-              dueOn
-              state
-            }
-            comments(first: 0) {
-              totalCount
-            }
-          }
-        }
-      }
-    `;
-
-		const result = await this.client.graphql<{
-			repository: {
-				issue: {
-					id: string;
-					number: number;
-					title: string;
-					body: string;
-					state: string;
-					createdAt: string;
-					updatedAt: string;
-					closedAt: string | null;
-					url: string;
-					author: {
-						login: string;
-						url: string;
-					};
-					assignees: {
-						nodes: Array<{
-							login: string;
-							url: string;
-						}>;
-					};
-					labels: {
-						nodes: Array<{
-							name: string;
-							color: string;
-						}>;
-					};
-					milestone: {
-						title: string;
-						dueOn: string | null;
-						state: string;
-					} | null;
-					comments: {
-						totalCount: number;
-					};
-				};
-			};
-		}>(query, {
-			owner,
-			name: repo,
-			number: issueNumber,
+	async getIssue(input: Omit<GetIssueQueryVariables, "owner">) {
+		const result = await this.client.graphql<
+			GetIssueQuery,
+			GetIssueQueryVariables
+		>(getIssue, {
+			...input,
+			owner: this.owner,
 		});
+
+		if (!result.repository?.issue) {
+			return null;
+		}
 
 		return result.repository.issue;
 	}
@@ -191,7 +118,6 @@ export class IssueOperations {
 	 */
 	async listIssues(params: ListIssuesParams) {
 		const {
-			owner,
 			repo,
 			state,
 			labels,
@@ -204,7 +130,7 @@ export class IssueOperations {
 		} = params;
 
 		// Use REST API for this operation as it has better filtering options
-		const path = `/repos/${owner}/${repo}/issues`;
+		const path = `/repos/${this.owner}/${repo}/issues`;
 		const queryParams: Record<string, string | undefined> = {
 			state,
 			sort,
@@ -270,8 +196,8 @@ export class IssueOperations {
 	 * Create a new issue
 	 */
 	async createIssue(params: CreateIssueParams) {
-		const { owner, repo, title, body, assignees, milestone, labels } = params;
-		const path = `/repos/${owner}/${repo}/issues`;
+		const { repo, title, body, assignees, milestone, labels } = params;
+		const path = `/repos/${this.owner}/${repo}/issues`;
 
 		const payload: Record<string, unknown> = {
 			title,
@@ -310,7 +236,6 @@ export class IssueOperations {
 	 */
 	async updateIssue(params: UpdateIssueParams) {
 		const {
-			owner,
 			repo,
 			issueNumber,
 			title,
@@ -320,7 +245,7 @@ export class IssueOperations {
 			labels,
 			milestone,
 		} = params;
-		const path = `/repos/${owner}/${repo}/issues/${issueNumber}`;
+		const path = `/repos/${this.owner}/${repo}/issues/${issueNumber}`;
 
 		const payload: Record<string, unknown> = {};
 

@@ -1,13 +1,3 @@
-import {
-	GitHubAuthenticationError,
-	GitHubConflictError,
-	type GitHubError,
-	GitHubPermissionError,
-	GitHubRateLimitError,
-	GitHubResourceNotFoundError,
-	GitHubValidationError,
-} from "../common/errors.js";
-
 /**
  * Parses the response body based on content type
  */
@@ -92,30 +82,4 @@ export function formatProjectId(id: string | number): string {
 	}
 
 	return id.toString();
-}
-
-/**
- *
- */
-function formatGitHubError(error: GitHubError): string {
-	let message = `GitHub API Error: ${error.message}`;
-
-	if (error instanceof GitHubValidationError) {
-		message = `Validation Error: ${error.message}`;
-		if (error.response) {
-			message += `\nDetails: ${JSON.stringify(error.response)}`;
-		}
-	} else if (error instanceof GitHubResourceNotFoundError) {
-		message = `Not Found: ${error.message}`;
-	} else if (error instanceof GitHubAuthenticationError) {
-		message = `Authentication Failed: ${error.message}`;
-	} else if (error instanceof GitHubPermissionError) {
-		message = `Permission Denied: ${error.message}`;
-	} else if (error instanceof GitHubRateLimitError) {
-		message = `Rate Limit Exceeded: ${error.message}\nResets at: ${error.resetAt.toISOString()}`;
-	} else if (error instanceof GitHubConflictError) {
-		message = `Conflict: ${error.message}`;
-	}
-
-	return message;
 }

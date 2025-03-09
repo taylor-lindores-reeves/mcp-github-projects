@@ -1,0 +1,18 @@
+mutation ConvertProjectV2DraftIssueItemToIssue(
+	$input: ConvertProjectV2DraftIssueItemToIssueInput!
+) {
+	convertProjectV2DraftIssueItemToIssue(input: $input) {
+		item {
+			id
+			content {
+				__typename
+				... on Issue {
+					id
+					title
+					number
+					url
+				}
+			}
+		}
+	}
+}

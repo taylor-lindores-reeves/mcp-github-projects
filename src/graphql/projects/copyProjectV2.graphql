@@ -1,0 +1,10 @@
+mutation CopyProjectV2($input: CopyProjectV2Input!) {
+	copyProjectV2(input: $input) {
+		projectV2 {
+			id
+			title
+			url
+			number
+		}
+	}
+}

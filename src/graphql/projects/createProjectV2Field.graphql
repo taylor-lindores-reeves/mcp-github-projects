@@ -1,0 +1,19 @@
+mutation CreateProjectV2Field($input: CreateProjectV2FieldInput!) {
+	createProjectV2Field(input: $input) {
+		projectV2Field {
+			... on ProjectV2Field {
+				id
+				name
+				dataType
+			}
+			... on ProjectV2SingleSelectField {
+				options {
+					id
+					name
+					description
+					color
+				}
+			}
+		}
+	}
+}

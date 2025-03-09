@@ -1,0 +1,18 @@
+query GetProject($id: ID!) {
+	node(id: $id) {
+		... on ProjectV2 {
+			id
+			title
+			shortDescription
+			url
+			creator {
+				login
+			}
+			public
+			closed
+			createdAt
+			updatedAt
+			number
+		}
+	}
+}

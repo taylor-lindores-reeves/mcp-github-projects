@@ -1,0 +1,19 @@
+query GetProjectColumns($id: ID!) {
+	node(id: $id) {
+		... on ProjectV2 {
+			fields(first: 20) {
+				nodes {
+					... on ProjectV2SingleSelectField {
+						id
+						name
+						options {
+							id
+							name
+							color
+						}
+					}
+				}
+			}
+		}
+	}
+}

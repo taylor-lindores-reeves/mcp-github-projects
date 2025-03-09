@@ -1,0 +1,20 @@
+query ListProjects($login: String!, $first: Int, $after: String) {
+  user(login: $login) {
+    projectsV2(first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        id
+        title
+        shortDescription
+        url
+        number
+        createdAt
+        updatedAt
+        closed
+      }
+    }
+  }
+}

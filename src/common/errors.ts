@@ -41,8 +41,8 @@ export class GitHubPermissionError extends GitHubError {
 
 export class GitHubRateLimitError extends GitHubError {
 	constructor(
-		message = "Rate limit exceeded",
 		public readonly resetAt: Date,
+		message = "Rate limit exceeded",
 	) {
 		super(message, 429, { message, reset_at: resetAt.toISOString() });
 		this.name = "GitHubRateLimitError";
@@ -63,27 +63,36 @@ export function isGitHubError(error: unknown): error is GitHubError {
 export function createGitHubError(status: number, response: any): GitHubError {
 	switch (status) {
 		case 401:
-			return new GitHubAuthenticationError(response?.message);
+			return new GitHubAuthenticationError(
+				response?.message || "Authentication Failed",
+			);
 		case 403:
-			return new GitHubPermissionError(response?.message);
+			return new GitHubPermissionError(
+				response?.message || "Permission Denied",
+			);
 		case 404:
 			return new GitHubResourceNotFoundError(response?.message || "Resource");
 		case 409:
 			return new GitHubConflictError(response?.message || "Conflict occurred");
-		case 422:
-			return new GitHubValidationError(
-				response?.message || "Validation failed",
-				status,
-				response,
-			);
-		case 429:
+		case 422: {
+			const validationMessage = response?.message || "Validation failed";
+			const detailedMessage = response
+				? `${validationMessage}\nDetails: ${JSON.stringify(response)}`
+				: validationMessage;
+			return new GitHubValidationError(detailedMessage, status, response);
+		}
+		case 429: {
+			const resetTime = new Date(response?.reset_at || Date.now() + 60000);
 			return new GitHubRateLimitError(
-				response?.message,
-				new Date(response?.reset_at || Date.now() + 60000),
+				resetTime,
+				response?.message
+					? `${response.message}\nResets at: ${resetTime.toISOString()}`
+					: `Rate Limit Exceeded\nResets at: ${resetTime.toISOString()}`,
 			);
+		}
 		default:
 			return new GitHubError(
-				response?.message || "GitHub API error",
+				response?.message || `GitHub API Error (Status: ${status})`,
 				status,
 				response,
 			);
