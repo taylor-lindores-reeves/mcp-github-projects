@@ -2,6 +2,10 @@
 
 A TypeScript server implementing the Model Context Protocol (MCP) to interact with GitHub's Projects v2 API for Agile project management.
 
+<a href="https://glama.ai/mcp/servers/86aw338aa5">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/86aw338aa5/badge" alt="GitHub Projects Server MCP server" />
+</a>
+
 ## Features
 
 - **GitHub Projects v2 API**: Full support for GitHub's GraphQL Projects v2 API
