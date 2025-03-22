@@ -1,0 +1,34 @@
+query GetProjectFields($id: ID!) {
+	node(id: $id) {
+		... on ProjectV2 {
+			fields(first: 50) {
+				nodes {
+					__typename
+					... on ProjectV2Field {
+						id
+						name
+					}
+					... on ProjectV2IterationField {
+						id
+						name
+						configuration {
+							iterations {
+								startDate
+								duration
+							}
+						}
+					}
+					... on ProjectV2SingleSelectField {
+						id
+						name
+						options {
+							id
+							name
+							color
+						}
+					}
+				}
+			}
+		}
+	}
+}

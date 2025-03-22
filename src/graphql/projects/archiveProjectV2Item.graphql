@@ -1,0 +1,5 @@
+mutation ArchiveProjectV2Item($input: ArchiveProjectV2ItemInput!) {
+	archiveProjectV2Item(input: $input) {
+		clientMutationId
+	}
+}

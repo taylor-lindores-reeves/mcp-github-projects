@@ -1,0 +1,12 @@
+mutation AddProjectV2DraftIssue($input: AddProjectV2DraftIssueInput!) {
+	addProjectV2DraftIssue(input: $input) {
+		projectItem {
+			id
+			type
+			project {
+				id
+				title
+			}
+		}
+	}
+}

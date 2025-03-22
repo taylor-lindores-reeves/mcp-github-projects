@@ -1,0 +1,9 @@
+mutation ClearProjectV2ItemFieldValue(
+	$input: ClearProjectV2ItemFieldValueInput!
+) {
+	clearProjectV2ItemFieldValue(input: $input) {
+		projectV2Item {
+			id
+		}
+	}
+}

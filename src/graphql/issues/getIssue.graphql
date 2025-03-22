@@ -1,0 +1,37 @@
+query GetIssue($owner: String!, $name: String!, $number: Int!) {
+	repository(owner: $owner, name: $name) {
+		issue(number: $number) {
+			id
+			number
+			title
+			body
+			createdAt
+			updatedAt
+			closedAt
+			url
+			author {
+				login
+				url
+			}
+			assignees(first: 10) {
+				nodes {
+					login
+					url
+				}
+			}
+			labels(first: 10) {
+				nodes {
+					name
+					color
+				}
+			}
+			milestone {
+				title
+				dueOn
+			}
+			comments(first: 0) {
+				totalCount
+			}
+		}
+	}
+}

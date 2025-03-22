@@ -1,0 +1,19 @@
+mutation UpdateProjectV2Field($input: UpdateProjectV2FieldInput!) {
+	updateProjectV2Field(input: $input) {
+		projectV2Field {
+			... on ProjectV2Field {
+				id
+				name
+				dataType
+			}
+			... on ProjectV2SingleSelectField {
+				options {
+					id
+					name
+					description
+					color
+				}
+			}
+		}
+	}
+}

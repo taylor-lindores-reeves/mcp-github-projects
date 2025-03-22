@@ -1,0 +1,8 @@
+mutation UnmarkProjectV2AsTemplate($input: UnmarkProjectV2AsTemplateInput!) {
+	unmarkProjectV2AsTemplate(input: $input) {
+		projectV2 {
+			id
+			template
+		}
+	}
+}

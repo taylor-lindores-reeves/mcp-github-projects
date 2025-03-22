@@ -1,0 +1,41 @@
+query GetRepository($owner: String!, $name: String!) {
+	repository(owner: $owner, name: $name) {
+		id
+		name
+		owner {
+			login
+			url
+			avatarUrl
+		}
+		nameWithOwner
+		description
+		url
+		homepageUrl
+		primaryLanguage {
+			name
+			color
+		}
+		isPrivate
+		isFork
+		isArchived
+		isTemplate
+		stargazerCount
+		forkCount
+		watchers {
+			totalCount
+		}
+		openIssues: issues(states: OPEN) {
+			totalCount
+		}
+		defaultBranchRef {
+			name
+		}
+		createdAt
+		updatedAt
+		pushedAt
+		licenseInfo {
+			name
+			spdxId
+		}
+	}
+}

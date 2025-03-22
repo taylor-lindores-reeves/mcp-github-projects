@@ -1,0 +1,12 @@
+mutation UpdateProjectV2StatusUpdate(
+	$input: UpdateProjectV2StatusUpdateInput!
+) {
+	updateProjectV2StatusUpdate(input: $input) {
+		statusUpdate {
+			id
+			body
+			createdAt
+			updatedAt
+		}
+	}
+}

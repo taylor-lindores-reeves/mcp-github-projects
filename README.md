@@ -6,18 +6,10 @@ An MCP (Model Context Protocol) server that enables AI agents to create and mana
 
 ## Features
 
-- **Project Management**: Create and manage GitHub Projects
-- **Sprint Planning**: Define iterations (sprints) with start and end dates
-- **Issue Tracking**: Create and update issues with Agile-focused metadata
-- **Workflow Automation**: Move tickets through different stages of your workflow
-- **AI-Friendly Interface**: Designed to work seamlessly with AI agents like Claude
-
-## Prerequisites
-
-- [Bun.js](https://bun.sh/) (v1.0.0+)
-- [Node.js](https://nodejs.org/) (v18+)
-- GitHub account with a Personal Access Token (PAT)
-- MCP-compatible host (like Claude for Desktop)
+- **GitHub Projects v2 API**: Full support for GitHub's GraphQL Projects v2 API
+- **GitHub Issues**: Create, read, and update GitHub issues
+- **GitHub Repositories**: Fetch repository details
+- **Type Safety**: Built with TypeScript for maximum type safety
 
 ## Installation
 
@@ -29,11 +21,13 @@ To install GitHub Projects MCP Server for Claude Desktop automatically via [Smit
 npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client claude
 ```
 
+## Usage
+
 ### Manual Installation
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/mcp-github-projects.git
+   git clone https://github.com/taylor-lindores-reeves/mcp-github-projects.git
    cd mcp-github-projects
    ```
 
@@ -45,92 +39,77 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
 3. Create a `.env` file with your GitHub token:
    ```
    GITHUB_TOKEN=your_github_personal_access_token
+   GITHUB_OWNER=your_github_username
    ```
 
-## Usage
+4. Build the server:
+   ```bash
+   bun run build
+   ```
 
-### Starting the Server
+5. Configure your MCP client with the following settings:
 
-Run the server using Bun:
-
-```bash
-bun run src/cli.ts
+```json
+{
+  "mcpServers": {
+    "GitHubProjects": {
+      "command": "bun",
+      "args": [
+        "/path/to/your/directory/mcp-github-projects-main/build/index.js"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "your_github_personal_access_token",
+        "GITHUB_OWNER": "your_github_username_or_org"
+      }
+    }
+  }
+}
 ```
 
-Or use the npm script:
+## Environment Variables
 
-```bash
-bun start
-```
+- `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate permissions
+- `GITHUB_OWNER`: GitHub username or organization name
 
-### Connecting to Claude for Desktop
+## GitHub Token Permissions
 
-1. Open Claude for Desktop
-2. Go to Settings > MCP Servers
-3. Add a new server with the following configuration:
-   - Name: GitHub Projects
-   - Command: `bun`
-   - Arguments: `run ${path_to_project}/src/cli.ts`
-   - Environment Variables: Add your GitHub token as `GITHUB_TOKEN`
+This MCP server requires a GitHub Personal Access Token (classic) with the following permissions:
 
-### Available Tools
-
-- `list-projects`: List all projects for a user or organization
-- `create-project`: Create a new project
-- `create-iteration`: Create a new iteration (sprint)
-- `list-issues`: List all issues for a repository
-- `create-issue`: Create a new issue
-- `update-issue-status`: Update the status of an issue
-
-### Example Prompts
-
-The server provides helpful prompt templates for common Agile workflows:
-
-- **Create Sprint**: Set up a new Sprint with a title and date range
-- **Plan Sprint**: Organize issues for an upcoming Sprint
-- **Move Ticket**: Update the status of an issue in the workflow
+- `project` - Full control of projects
+- `read:project` - Read access of projects
+- `repo` - Full control of private repositories
+- `repo:status` - Access commit status
+- `repo_deployment` - Access deployment status
+- `public_repo` - Access public repositories
+- `repo:invite` - Access repository invitations
+- `security_events` - Read and write security events
 
 ## Development
 
-### Project Structure
+### Commands
 
-```
-mcp-github-projects/
-├── src/
-│   ├── types/             # TypeScript type definitions
-│   ├── services/          # Service integrations (GitHub API)
-│   ├── resources/         # MCP resources
-│   ├── mcp-server.ts      # Main MCP server implementation
-│   └── cli.ts             # Command-line interface
-├── index.ts               # Entry point
-├── package.json           # Project metadata
-└── README.md              # This file
-```
+- Build: `bun run build`
+- Generate GraphQL types: `bun run graphql-codegen`
 
-### Adding New Features
+## Project Structure
 
-To add new tools or capabilities:
+This project is a MCP Server for GitHub's GraphQL API, with focus on Project V2 operations.
+The codebase provides typed access to GitHub projects functionality through GraphQL.
 
-1. Update the appropriate service in `src/services/`
-2. Add a new resource handler in `src/resources/`
-3. Register the tool in `src/mcp-server.ts`
+## Available Operations
 
-## Security Considerations
+### Projects
+- Create, read, update, and delete GitHub Projects
+- Manage project fields, items, and status updates
+- Convert draft issues to actual issues
+- Archive and unarchive project items
 
-- The server runs with the permissions of the provided GitHub token
-- All operations are performed through the GitHub API
-- No data is stored locally outside of the current session
-- Consider using a token with limited scope for production use
+### Issues
+- Get issue details
+- Add issues to projects
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Repositories
+- Get repository information
 
 ## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- GitHub Projects API for providing the underlying project management capabilities
-- Model Context Protocol (MCP) for creating a standardized way to extend AI agent functionality
+MIT
