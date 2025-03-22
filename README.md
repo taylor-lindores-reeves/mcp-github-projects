@@ -7,121 +7,80 @@ A TypeScript server implementing the Model Context Protocol (MCP) to interact wi
 - **GitHub Projects v2 API**: Full support for GitHub's GraphQL Projects v2 API
 - **GitHub Issues**: Create, read, and update GitHub issues
 - **GitHub Repositories**: Fetch repository details
-- **Error Handling**: Comprehensive error handling for all GitHub API interactions
-- **Type Safety**: Built with TypeScript and Zod for maximum type safety
-
-## Directory Structure
-
-```
-.
-├── common/
-│   └── errors.ts          # Error handling for GitHub API
-├── operations/
-│   ├── github-client.ts   # GitHub API client for GraphQL and REST
-│   ├── issues.ts          # GitHub Issues operations
-│   ├── projects.ts        # GitHub Projects v2 operations
-│   ├── repositories.ts    # GitHub Repository operations
-│   └── index.ts           # Operations exports
-├── index.ts               # Main server entry point
-├── config.ts              # Application configuration
-├── package.json
-└── README.md
-```
+- **Type Safety**: Built with TypeScript for maximum type safety
 
 ## Installation
 
-1. Clone the repository
-2. Install dependencies:
+1. Install packages and build the server:
 
 ```bash
 bun install
+bun run build
 ```
 
-3. Create a `.env` file with your GitHub token:
+2. Configure your MCP client with the following settings:
 
+```json
+{
+  "mcpServers": {
+    "GitHubProjects": {
+      "command": "bun",
+      "args": [
+        "/path/to/your/directory/mcp-github-projects-main/build/index.js"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "your_github_personal_access_token",
+        "GITHUB_OWNER": "your_github_username_or_org"
+      }
+    }
+  }
+}
 ```
-GITHUB_TOKEN=your_github_personal_access_token
-```
-
-## Usage
-
-### Start the server
-
-```bash
-bun start
-```
-
-For development with auto-reload:
-
-```bash
-bun dev
-```
-
-## Available Tools
-
-The MCP server exposes the following tools:
-
-<!-- ### Repositories -->
-
-<!-- - **get-repository**: Get a GitHub repository by owner and name -->
-
-### Projects
-
-- **get-project**: Get a GitHub Project by ID
-- **list-projects**: List GitHub Projects for a user
-- **get-project-columns**: Get status columns for a GitHub Project
-- **get-project-fields**: Get fields for a GitHub Project
-- **get-project-items**: Get items (issues) from a GitHub Project
-- **create-project-item**: Add an issue or PR to a GitHub Project
-- **update-project-item-field**: Update a field value for a project item
-
-### Issues
-
-- **get-issue**: Get a GitHub issue by number
-- **list-issues**: List issues for a repository
-- **create-issue**: Create a new GitHub issue
-- **update-issue**: Update an existing GitHub issue
 
 ## Environment Variables
 
 - `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate permissions
-- `PORT` (optional): Port to run the server on (default: 3000)
-- `NODE_ENV`: Environment mode (development, production, test)
+- `GITHUB_OWNER`: GitHub username or organization name
 
 ## GitHub Token Permissions
 
-The GitHub token requires the following permissions:
+This MCP server requires a GitHub Personal Access Token (classic) with the following permissions:
 
+- `project` - Full control of projects
+- `read:project` - Read access of projects
 - `repo` - Full control of private repositories
-- `project` - Full control of user projects
-- `read:org` - Read organization membership
+- `repo:status` - Access commit status
+- `repo_deployment` - Access deployment status
+- `public_repo` - Access public repositories
+- `repo:invite` - Access repository invitations
+- `security_events` - Read and write security events
 
 ## Development
 
-### Building
+### Commands
 
-```bash
-bun build
-```
+- Build: `bun run build`
+- Generate GraphQL types: `bun run graphql-codegen`
 
-### Testing
+## Project Structure
 
-```bash
-bun test
-```
+This project is a MCP Server for GitHub's GraphQL API, with focus on Project V2 operations.
+The codebase provides typed access to GitHub projects functionality through GraphQL.
 
-## GitHub Projects v2 GraphQL API
+## Available Operations
 
-This MCP server is built on top of GitHub's GraphQL API v2 for Projects. It uses the following GraphQL endpoints:
+### Projects
+- Create, read, update, and delete GitHub Projects
+- Manage project fields, items, and status updates
+- Convert draft issues to actual issues
+- Archive and unarchive project items
 
-- Projects Query: Fetch projects and project details
-- Project Field Query: Get field definitions from a project
-- Project Items Query: Get items within a project
-- Add Project Item Mutation: Add items to a project
-- Update Project Item Field Mutation: Update field values for project items
+### Issues
+- Get issue details
+- Add issues to projects
 
-For more information on GitHub's GraphQL API, see the [official documentation](https://docs.github.com/en/graphql).
+### Repositories
+- Get repository information
 
 ## License
-
 MIT

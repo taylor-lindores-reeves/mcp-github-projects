@@ -11,9 +11,7 @@
     "build"
   ],
   "scripts": {
-    "build": "bunx tsx build.ts",
-    "build:dev": "tsc",
-    "codegen": "graphql-codegen"
+    "build": "graphql-codegen && bunx tsx build.ts"
   },
   "keywords": [
     "github",
