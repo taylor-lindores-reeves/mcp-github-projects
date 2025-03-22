@@ -4,6 +4,10 @@
 
 An MCP (Model Context Protocol) server that enables AI agents to create and manage Agile Sprint-based projects using GitHub Projects.
 
+<a href="https://glama.ai/mcp/servers/86aw338aa5">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/86aw338aa5/badge" alt="GitHub Projects Server MCP server" />
+</a>
+
 ## Features
 
 - **GitHub Projects v2 API**: Full support for GitHub's GraphQL Projects v2 API
@@ -110,6 +114,3 @@ The codebase provides typed access to GitHub projects functionality through Grap
 
 ### Repositories
 - Get repository information
-
-## License
-MIT
