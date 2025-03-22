@@ -61,10 +61,9 @@ bun dev
 
 The MCP server exposes the following tools:
 
-### Repositories
+<!-- ### Repositories -->
 
-- **get-repository**: Get a GitHub repository by owner and name
-- **list-repositories**: List repositories for a user
+<!-- - **get-repository**: Get a GitHub repository by owner and name -->
 
 ### Projects
 

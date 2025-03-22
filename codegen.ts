@@ -14,6 +14,7 @@ const config: CodegenConfig = {
 				namingConvention: {
 					transformUnderscore: true, // Remove underscores from names
 				},
+
 				scalars: {
 					// Define how GraphQL scalars map to TS
 					DateTime: "string",

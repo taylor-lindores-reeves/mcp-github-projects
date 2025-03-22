@@ -74,6 +74,7 @@ import {
 	type MarkProjectV2AsTemplateMutation,
 	type MarkProjectV2AsTemplateMutationVariables,
 	ProjectV2CustomFieldType,
+	type ProjectV2FieldValue,
 	ProjectV2SingleSelectFieldOptionColor,
 	ProjectV2StatusUpdateStatus,
 	type UnarchiveProjectV2ItemInput,
@@ -106,12 +107,12 @@ export const GetProjectSchema = {
 };
 
 export const ListProjectsSchema = {
-	login: z.string().describe("GitHub user or organization login"),
-	first: z
-		.number()
-		.nullable()
-		.describe("Number of projects to return (max 100)"),
-	after: z.string().nullable().describe("Cursor for pagination"),
+	login: z
+		.string()
+		.describe("GitHub user or organization login")
+		.default(process.env.GITHUB_OWNER as string),
+	first: z.number().describe("Number of projects to return (max 100)"),
+	after: z.string().describe("Cursor for pagination"),
 };
 
 export const GetProjectColumnsSchema = {
@@ -124,75 +125,97 @@ export const GetProjectFieldsSchema = {
 
 export const GetProjectItemsSchema = {
 	id: z.string().describe("GitHub Project ID"),
-	first: z.number().nullable().describe("Number of items to return (max 100)"),
-	after: z.string().nullable().describe("Cursor for pagination"),
+	first: z.number().describe("Number of items to return (max 100)"),
+	after: z.string().describe("Cursor for pagination"),
 	filter: z
 		.string()
-		.nullable()
+
 		.describe("Filter for items (e.g., status field value)"),
 };
-// Type for field values in projects
+
 export const FieldValueSchema = z
 	.object({
-		type: z.enum(["singleSelect", "iteration", "date", "number", "text"]),
-		// Each field type corresponds to a property in ProjectV2FieldValue
-		singleSelectOptionId: z.string().nullable(),
-		iterationId: z.string().nullable(),
-		date: z.string().nullable(), // Made nullable to match ProjectV2FieldValue
-		number: z.number().nullable(),
-		text: z.string().nullable(),
+		singleSelectOptionId: z
+			.string()
+			.optional()
+			.describe("The id of the single select option to set on the field."),
+		iterationId: z
+			.string()
+			.optional()
+			.describe("The id of the iteration to set on the field."),
+		date: z
+			.string()
+			.optional()
+			.describe("The ISO 8601 date to set on the field."),
+		number: z.number().optional().describe("The number to set on the field."),
+		text: z.string().optional().describe("The text to set on the field."),
 	})
 	.refine(
 		(data) => {
-			// Ensure the correct field is provided based on type
-			switch (data.type) {
-				case "singleSelect":
-					return data.singleSelectOptionId !== undefined;
-				case "iteration":
-					return data.iterationId !== undefined;
-				case "date":
-					return data.date !== undefined;
-				case "number":
-					return data.number !== undefined;
-				case "text":
-					return data.text !== undefined;
-				default:
-					return false;
-			}
+			// Count defined values (not undefined, not null, and not empty string)
+			const definedCount = Object.values(data).filter(
+				(value) => value !== undefined && value !== null && value !== "",
+			).length;
+
+			// Exactly one value must be provided
+			return definedCount === 1;
 		},
 		{
-			message:
-				"Field value must include the appropriate property for the specified type",
+			message: "Exactly one value must be provided.",
 		},
 	)
-	.describe("Field value for project items");
+	.transform((data) => {
+		// Create a new object with only defined values
+		const result = {} as ProjectV2FieldValue;
+
+		for (const [key, value] of Object.entries(data)) {
+			if (value !== undefined && value !== null) {
+				result[key as keyof ProjectV2FieldValue] = value;
+			}
+		}
+
+		return result;
+	});
 
 export const UpdateProjectItemFieldValueSchema = {
-	projectId: z.string().describe("GitHub Project ID"),
-	itemId: z.string().describe("ID of the project item"),
-	fieldId: z.string().describe("ID of the field to update"),
-	value: FieldValueSchema.describe("New value for the field"),
+	projectId: z.string().describe("The ID of the Project."),
+	itemId: z.string().describe("The ID of the item to be updated."),
+	fieldId: z.string().describe("The ID of the field to be updated."),
+	value: FieldValueSchema.describe(
+		"The values that can be used to update a field of an item inside a Project. Only 1 value can be updated at a time.",
+	),
 	clientMutationId: z
 		.string()
-		.nullable()
-		.describe("Client-supplied mutation ID"),
+
+		.describe(
+			"A unique string identifier for the client performing the mutation.",
+		)
+		.default(Date.now().toString()),
+};
+
+export const BulkUpdateProjectItemFieldValueSchema = {
+	projectId: z.string().describe("The ID of the Project."),
+	itemIds: z.array(z.string()).describe("The IDs of the items to be updated."),
+	fieldId: z.string().describe("The ID of the field to be updated."),
+	value: FieldValueSchema.describe(
+		"The values that can be used to update a field of an item inside a Project. Only 1 value can be updated at a time.",
+	),
+	clientMutationId: z
+		.string()
+		.describe(
+			"A unique string identifier for the client performing the mutation.",
+		)
+		.default(Date.now().toString()),
 };
 
 // New schema definitions for Project V2 operations
 export const CreateProjectV2Schema = {
 	ownerId: z.string().describe("The owner ID to create the project under."),
 	title: z.string().describe("The title of the project."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
-	repositoryId: z
-		.string()
-		.nullable()
-		.describe("The repository to link the project to."),
+	clientMutationId: z.string().default(Date.now().toString()),
+	repositoryId: z.string().describe("The repository to link the project to."),
 	teamId: z
 		.string()
-		.nullable()
 		.describe(
 			"The team to link the project to. The team will be granted read permissions.",
 		),
@@ -200,32 +223,26 @@ export const CreateProjectV2Schema = {
 
 export const UpdateProjectV2Schema = {
 	projectId: z.string().describe("The ID of the Project to update."),
-	title: z.string().nullable().describe("Set the title of the project."),
+	title: z.string().describe("Set the title of the project."),
 	shortDescription: z
 		.string()
-		.nullable()
+
 		.describe("Set the short description of the project."),
 	public: z
 		.boolean()
-		.nullable()
+
 		.describe("Set the project to public or private."),
-	closed: z.boolean().nullable().describe("Set the project to closed or open."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	closed: z.boolean().describe("Set the project to closed or open."),
+	clientMutationId: z.string().default(Date.now().toString()),
 	readme: z
 		.string()
-		.nullable()
+
 		.describe("Set the readme description of the project."),
 };
 
 export const DeleteProjectV2Schema = {
 	projectId: z.string().describe("The ID of the Project to delete."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const CopyProjectV2Schema = {
@@ -234,12 +251,9 @@ export const CopyProjectV2Schema = {
 	title: z.string().describe("The title of the project."),
 	includeDraftIssues: z
 		.boolean()
-		.nullable()
+
 		.describe("Include draft issues in the new project"),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const AddProjectV2DraftIssueSchema = {
@@ -251,15 +265,12 @@ export const AddProjectV2DraftIssueSchema = {
 		.describe(
 			"The title of the draft issue. A project item can also be created by providing the URL of an Issue or Pull Request if you have access.",
 		),
-	body: z.string().nullable().describe("The body of the draft issue."),
+	body: z.string().describe("The body of the draft issue."),
 	assigneeIds: z
 		.array(z.string())
-		.nullable()
+
 		.describe("The IDs of the assignees of the draft issue."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const ConvertProjectV2DraftIssueToIssueSchema = {
@@ -269,19 +280,13 @@ export const ConvertProjectV2DraftIssueToIssueSchema = {
 	repositoryId: z
 		.string()
 		.describe("The ID of the repository to create the issue in."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const AddProjectV2ItemByIdSchema = {
 	projectId: z.string().describe("The ID of the Project to add the item to."),
 	contentId: z.string().describe("The id of the Issue or Pull Request to add."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const UpdateProjectV2ItemPositionSchema = {
@@ -289,14 +294,11 @@ export const UpdateProjectV2ItemPositionSchema = {
 	itemId: z.string().describe("The ID of the item to be moved."),
 	afterId: z
 		.string()
-		.nullable()
+
 		.describe(
 			"The ID of the item to position this item after. If omitted or set to null the item will be moved to top.",
 		),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const DeleteProjectV2ItemSchema = {
@@ -304,10 +306,7 @@ export const DeleteProjectV2ItemSchema = {
 		.string()
 		.describe("The ID of the Project from which the item should be removed."),
 	itemId: z.string().describe("The ID of the item to be removed."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const CreateProjectV2FieldSchema = {
@@ -328,18 +327,15 @@ export const CreateProjectV2FieldSchema = {
 					.describe("The display color of the option"),
 			}),
 		)
-		.nullable()
+
 		.describe(
 			"Options for a single select field. At least one value is required if data_type is SINGLE_SELECT",
 		),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 	iterationConfiguration: z.object({
 		startDate: z
 			.string()
-			.nullable()
+
 			.describe("The start date for the first iteration."),
 		duration: z.number().describe("The duration of each iteration, in days."),
 		iterations: z
@@ -358,7 +354,7 @@ export const CreateProjectV2FieldSchema = {
 
 export const UpdateProjectV2FieldSchema = {
 	fieldId: z.string().describe("The ID of the field to update."),
-	name: z.string().nullable().describe("The name to update."),
+	name: z.string().describe("The name to update."),
 	singleSelectOptions: z
 		.array(
 			z.object({
@@ -369,14 +365,11 @@ export const UpdateProjectV2FieldSchema = {
 					.describe("The display color of the option"),
 			}),
 		)
-		.nullable()
+
 		.describe(
 			"Options for a field of type SINGLE_SELECT. If empty, no changes will be made to the options. If values are present, they will overwrite the existing options for the field.",
 		),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 	iterationConfiguration: z
 		.object({
 			duration: z.number().describe("The duration of each iteration, in days."),
@@ -393,38 +386,31 @@ export const UpdateProjectV2FieldSchema = {
 				.describe("Zero or more iterations for the field."),
 			startDate: z.string().describe("The start date for the first iteration."),
 		})
-		.nullable()
 		.describe("Configuration for an iteration field."),
 };
 
 export const DeleteProjectV2FieldSchema = {
 	fieldId: z.string().describe("The ID of the field to delete."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const UpdateProjectV2StatusUpdateSchema = {
 	statusUpdateId: z
 		.string()
 		.describe("The ID of the status update to be updated."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
-	body: z.string().nullable().describe("The body of the status update."),
+	clientMutationId: z.string().default(Date.now().toString()),
+	body: z.string().describe("The body of the status update."),
 	startDate: z
 		.string()
-		.nullable()
+
 		.describe("The start date of the status update."),
 	targetDate: z
 		.string()
-		.nullable()
+
 		.describe("The target date of the status update."),
 	status: z
 		.nativeEnum(ProjectV2StatusUpdateStatus)
-		.nullable()
+
 		.describe("The status of the status update."),
 };
 
@@ -435,8 +421,10 @@ export const ArchiveProjectV2ItemSchema = {
 	itemId: z.string().describe("The ID of the ProjectV2Item to archive."),
 	clientMutationId: z
 		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+
+		.describe(
+			"A unique string identifier for the client performing the mutation.",
+		),
 };
 
 export const UnarchiveProjectV2ItemSchema = {
@@ -444,41 +432,34 @@ export const UnarchiveProjectV2ItemSchema = {
 		.string()
 		.describe("The ID of the Project to archive the item from."),
 	itemId: z.string().describe("The ID of the ProjectV2Item to unarchive."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const ClearProjectV2ItemFieldValueSchema = {
 	projectId: z.string().describe("The ID of the Project."),
 	itemId: z.string().describe("The ID of the item to be cleared."),
 	fieldId: z.string().describe("The ID of the field to be cleared."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const MarkProjectV2AsTemplateSchema = {
 	projectId: z
 		.string()
 		.describe("The ID of the Project to mark as a template."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
 
 export const UnmarkProjectV2AsTemplateSchema = {
 	projectId: z
 		.string()
 		.describe("The ID of the Project to unmark as a template."),
-	clientMutationId: z
-		.string()
-		.nullable()
-		.describe("A unique identifier for the client performing the mutation."),
+	clientMutationId: z.string().default(Date.now().toString()),
 };
+
+interface BulkUpdateProjectV2ItemFieldValueInput
+	extends Omit<UpdateProjectV2ItemFieldValueInput, "itemId"> {
+	itemIds: string[];
+}
 
 // Project operations class
 export class ProjectOperations {
@@ -490,9 +471,6 @@ export class ProjectOperations {
 		this.owner = process.env.GITHUB_OWNER as string;
 	}
 
-	/**
-	 * Get a GitHub Project by ID
-	 */
 	async getProject(params: GetProjectQueryVariables) {
 		return this.client.graphql<GetProjectQuery, GetProjectQueryVariables>(
 			getProject,
@@ -500,17 +478,14 @@ export class ProjectOperations {
 		);
 	}
 
-	/**
-	 * List GitHub Projects for a user
-	 */
 	async listProjects(params: ListProjectsQueryVariables) {
 		const result = await this.client.graphql<
 			ListProjectsQuery,
 			ListProjectsQueryVariables
 		>(listProjects, {
 			login: this.owner,
-			first: params.first || 20,
-			after: params.after || null,
+			first: params?.first || 20,
+			after: params?.after || null,
 		});
 
 		// Determine if the response contains user data
@@ -607,6 +582,28 @@ export class ProjectOperations {
 			success: true,
 			itemId: result.updateProjectV2ItemFieldValue?.projectV2Item?.id,
 		};
+	}
+
+	async bulkUpdateProjectItemFieldValue(
+		input: BulkUpdateProjectV2ItemFieldValueInput,
+	) {
+		const results = [];
+		const { itemIds, ...singleItemInput } = input; // Remove itemIds from the input
+
+		for (const itemId of itemIds) {
+			try {
+				const result = await this.updateProjectItemFieldValue({
+					...singleItemInput,
+					itemId,
+					clientMutationId: `bulk-update-${Date.now()}-${itemId}`,
+				});
+				results.push({ itemId, success: result.success });
+			} catch (error) {
+				results.push({ itemId, success: false, error });
+			}
+		}
+
+		return results;
 	}
 
 	/**

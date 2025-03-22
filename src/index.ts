@@ -1,11 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import {
-	issueOperations,
-	projectOperations,
-	repositoryOperations,
-} from "./operations/index.js";
+import { issueOperations, projectOperations } from "./operations/index.js";
 import {
 	CreateIssueSchema,
 	GetIssueSchema,
@@ -16,6 +12,7 @@ import {
 	AddProjectV2DraftIssueSchema,
 	AddProjectV2ItemByIdSchema,
 	ArchiveProjectV2ItemSchema,
+	BulkUpdateProjectItemFieldValueSchema,
 	ClearProjectV2ItemFieldValueSchema,
 	ConvertProjectV2DraftIssueToIssueSchema,
 	CopyProjectV2Schema,
@@ -38,7 +35,7 @@ import {
 	UpdateProjectV2Schema,
 	UpdateProjectV2StatusUpdateSchema,
 } from "./operations/projects.js";
-import {
+import type {
 	GetRepositorySchema,
 	ListRepositoriesSchema,
 } from "./operations/repositories.js";
@@ -229,39 +226,39 @@ server.prompt(
 );
 
 // Define tools metadata
-server.tool<GetRepositoryParams>(
-	"get-repository",
-	"Get a GitHub repository by owner and name",
-	GetRepositorySchema,
-	async (params) => {
-		const result = await repositoryOperations.getRepository(params);
-		return {
-			content: [
-				{
-					type: "text",
-					text: JSON.stringify(result, null, 2),
-				},
-			],
-		};
-	},
-);
+// server.tool<GetRepositoryParams>(
+// 	"get-repository",
+// 	"Get a GitHub repository by owner and name",
+// 	GetRepositorySchema,
+// 	async (params) => {
+// 		const result = await repositoryOperations.getRepository(params);
+// 		return {
+// 			content: [
+// 				{
+// 					type: "text",
+// 					text: JSON.stringify(result, null, 2),
+// 				},
+// 			],
+// 		};
+// 	},
+// );
 
-server.tool<ListRepositoriesParams>(
-	"list-repositories",
-	"List repositories for a user",
-	ListRepositoriesSchema,
-	async (params) => {
-		const result = await repositoryOperations.listRepositories(params);
-		return {
-			content: [
-				{
-					type: "text",
-					text: JSON.stringify(result, null, 2),
-				},
-			],
-		};
-	},
-);
+// server.tool<ListRepositoriesParams>(
+// 	"list-repositories",
+// 	"List repositories for a user",
+// 	ListRepositoriesSchema,
+// 	async (params) => {
+// 		const result = await repositoryOperations.listRepositories(params);
+// 		return {
+// 			content: [
+// 				{
+// 					type: "text",
+// 					text: JSON.stringify(result, null, 2),
+// 				},
+// 			],
+// 		};
+// 	},
+// );
 
 server.tool<GetProjectParams>(
 	"get-project",
@@ -354,6 +351,24 @@ server.tool(
 	UpdateProjectItemFieldValueSchema,
 	async (params) => {
 		const result = await projectOperations.updateProjectItemFieldValue(params);
+		return {
+			content: [
+				{
+					type: "text",
+					text: JSON.stringify(result, null, 2),
+				},
+			],
+		};
+	},
+);
+
+server.tool(
+	"bulk-update-project-item-field",
+	"Update a field value for multiple project items",
+	BulkUpdateProjectItemFieldValueSchema,
+	async (params) => {
+		const result =
+			await projectOperations.bulkUpdateProjectItemFieldValue(params);
 		return {
 			content: [
 				{
