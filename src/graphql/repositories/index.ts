@@ -1,9 +1,4 @@
-import path from "node:path";
-import { loadGraphQLFiles } from "../../utils/graphql-loader.js";
+import getRepositoryQuery from "../repositories/getRepository.graphql";
 
-// Load all GraphQL files from the repositories directory
-const graphqlDir = path.join("src", "graphql", "repositories");
-const operations = loadGraphQLFiles(graphqlDir);
-
-// Export each operation by name
-export const { getRepository } = operations;
+// Export operations
+export const getRepository = getRepositoryQuery;

@@ -1,34 +1,52 @@
-import path from "node:path";
-import { loadGraphQLFiles } from "../../utils/graphql-loader.js";
+import addProjectV2DraftIssueMutation from "../projects/addProjectV2DraftIssue.graphql";
+import addProjectV2ItemByIdMutation from "../projects/addProjectV2ItemById.graphql";
+import archiveProjectV2ItemMutation from "../projects/archiveProjectV2Item.graphql";
+import clearProjectV2ItemFieldValueMutation from "../projects/clearProjectV2ItemFieldValue.graphql";
+import convertProjectV2DraftIssueToIssueMutation from "../projects/convertProjectV2DraftIssueToIssue.graphql";
+import copyProjectV2Mutation from "../projects/copyProjectV2.graphql";
+import createProjectV2Mutation from "../projects/createProjectV2.graphql";
+import createProjectV2FieldMutation from "../projects/createProjectV2Field.graphql";
+import deleteProjectV2Mutation from "../projects/deleteProjectV2.graphql";
+import deleteProjectV2FieldMutation from "../projects/deleteProjectV2Field.graphql";
+import deleteProjectV2ItemMutation from "../projects/deleteProjectV2Item.graphql";
+import getProjectQuery from "../projects/getProject.graphql";
+import getProjectColumnsQuery from "../projects/getProjectColumns.graphql";
+import getProjectFieldsQuery from "../projects/getProjectFields.graphql";
+import getProjectItemsQuery from "../projects/getProjectItems.graphql";
+import listProjectsQuery from "../projects/listProjects.graphql";
+import markProjectV2AsTemplateMutation from "../projects/markProjectV2AsTemplate.graphql";
+import unarchiveProjectV2ItemMutation from "../projects/unarchiveProjectV2Item.graphql";
+import unmarkProjectV2AsTemplateMutation from "../projects/unmarkProjectV2AsTemplate.graphql";
+import updateProjectItemFieldValueMutation from "../projects/updateProjectItemFieldValue.graphql";
+import updateProjectV2Mutation from "../projects/updateProjectV2.graphql";
+import updateProjectV2FieldMutation from "../projects/updateProjectV2Field.graphql";
+import updateProjectV2ItemPositionMutation from "../projects/updateProjectV2ItemPosition.graphql";
+import updateProjectV2StatusUpdateMutation from "../projects/updateProjectV2StatusUpdate.graphql";
 
-// Load all GraphQL files from the projects directory
-const graphqlDir = path.join("src", "graphql", "projects");
-const operations = loadGraphQLFiles(graphqlDir);
-
-// Export each operation by name
-export const {
-	getProject,
-	listProjects,
-	getProjectColumns,
-	getProjectFields,
-	getProjectItems,
-	addProjectV2ItemById,
-	updateProjectItemFieldValue,
-	createProjectV2,
-	updateProjectV2,
-	deleteProjectV2,
-	copyProjectV2,
-	addProjectV2DraftIssue,
-	convertProjectV2DraftIssueToIssue,
-	updateProjectV2ItemPosition,
-	deleteProjectV2Item,
-	createProjectV2Field,
-	updateProjectV2Field,
-	deleteProjectV2Field,
-	updateProjectV2StatusUpdate,
-	archiveProjectV2Item,
-	unarchiveProjectV2Item,
-	clearProjectV2ItemFieldValue,
-	markProjectV2AsTemplate,
-	unmarkProjectV2AsTemplate,
-} = operations;
+// Export operations
+export const getProject = getProjectQuery;
+export const listProjects = listProjectsQuery;
+export const getProjectColumns = getProjectColumnsQuery;
+export const getProjectFields = getProjectFieldsQuery;
+export const getProjectItems = getProjectItemsQuery;
+export const addProjectV2ItemById = addProjectV2ItemByIdMutation;
+export const updateProjectItemFieldValue = updateProjectItemFieldValueMutation;
+export const createProjectV2 = createProjectV2Mutation;
+export const updateProjectV2 = updateProjectV2Mutation;
+export const deleteProjectV2 = deleteProjectV2Mutation;
+export const copyProjectV2 = copyProjectV2Mutation;
+export const addProjectV2DraftIssue = addProjectV2DraftIssueMutation;
+export const convertProjectV2DraftIssueToIssue =
+	convertProjectV2DraftIssueToIssueMutation;
+export const updateProjectV2ItemPosition = updateProjectV2ItemPositionMutation;
+export const deleteProjectV2Item = deleteProjectV2ItemMutation;
+export const createProjectV2Field = createProjectV2FieldMutation;
+export const updateProjectV2Field = updateProjectV2FieldMutation;
+export const deleteProjectV2Field = deleteProjectV2FieldMutation;
+export const updateProjectV2StatusUpdate = updateProjectV2StatusUpdateMutation;
+export const archiveProjectV2Item = archiveProjectV2ItemMutation;
+export const unarchiveProjectV2Item = unarchiveProjectV2ItemMutation;
+export const clearProjectV2ItemFieldValue =
+	clearProjectV2ItemFieldValueMutation;
+export const markProjectV2AsTemplate = markProjectV2AsTemplateMutation;
+export const unmarkProjectV2AsTemplate = unmarkProjectV2AsTemplateMutation;
