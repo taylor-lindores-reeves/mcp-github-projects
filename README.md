@@ -30,23 +30,27 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
 ### Manual Installation
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/taylor-lindores-reeves/mcp-github-projects.git
    cd mcp-github-projects
    ```
 
 2. Install dependencies:
+
    ```bash
    bun install
    ```
 
 3. Create a `.env` file with your GitHub token:
+
    ```
    GITHUB_TOKEN=your_github_personal_access_token
    GITHUB_OWNER=your_github_username
    ```
 
 4. Build the server:
+
    ```bash
    bun run build
    ```
@@ -63,7 +67,8 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
       ],
       "env": {
         "GITHUB_TOKEN": "your_github_personal_access_token",
-        "GITHUB_OWNER": "your_github_username_or_org"
+        "GITHUB_OWNER": "your_github_username_or_org",
+        "ALLOWED_REPOS": "owner/repo,another/repo"
       }
     }
   }
@@ -74,6 +79,7 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
 
 - `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate permissions
 - `GITHUB_OWNER`: GitHub username or organization name
+- `ALLOWED_REPOS`: (Optional) Comma-separated list of allowed repository slugs (e.g. `owner/repo,another/repo`). All write operations (creating/updating issues, adding items to projects, etc.) are restricted to these repositories. If not set or empty, all repositories are allowed by default.
 
 ## GitHub Token Permissions
 
@@ -103,14 +109,17 @@ The codebase provides typed access to GitHub projects functionality through Grap
 ## Available Operations
 
 ### Projects
+
 - Create, read, update, and delete GitHub Projects
 - Manage project fields, items, and status updates
 - Convert draft issues to actual issues
 - Archive and unarchive project items
 
 ### Issues
+
 - Get issue details
 - Add issues to projects
 
 ### Repositories
+
 - Get repository information
