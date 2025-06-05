@@ -97,6 +97,13 @@ function isRepoAllowedSlug(slug: string) {
   );
 }
 
+function getRepoSlug(owner: string, repo: string) {
+  // If repo already contains a slash, assume it's a full slug
+  return repo.includes("/")
+    ? repo.toLowerCase()
+    : `${owner}/${repo}`.toLowerCase();
+}
+
 export class IssueOperations {
   private client: GitHubClient;
   private owner: string;
@@ -209,7 +216,7 @@ export class IssueOperations {
    */
   async createIssue(params: CreateIssueParams) {
     const { repo, title, body, assignees, milestone, labels } = params;
-    const repoSlug = `${this.owner}/${repo}`;
+    const repoSlug = getRepoSlug(this.owner, repo);
     if (!isRepoAllowedSlug(repoSlug)) {
       throw new Error(
         `Repository ${repoSlug} is not allowed by ALLOWED_REPOS, which is ${ALLOWED_REPOS.join(
@@ -265,9 +272,13 @@ export class IssueOperations {
       labels,
       milestone,
     } = params;
-    const repoSlug = `${this.owner}/${repo}`;
+    const repoSlug = getRepoSlug(this.owner, repo);
     if (!isRepoAllowedSlug(repoSlug)) {
-      throw new Error(`Repository ${repoSlug} is not allowed by ALLOWED_REPOS`);
+      throw new Error(
+        `Repository ${repoSlug} is not allowed by ALLOWED_REPOS, which is ${ALLOWED_REPOS.join(
+          ", "
+        )}`
+      );
     }
     const path = `/repos/${this.owner}/${repo}/issues/${issueNumber}`;
 

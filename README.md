@@ -47,6 +47,8 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
    ```
    GITHUB_TOKEN=your_github_personal_access_token
    GITHUB_OWNER=your_github_username
+   GITHUB_OWNER_TYPE=org
+   ALLOWED_REPOS=owner/repo,another/repo
    ```
 
 4. Build the server:
@@ -68,6 +70,7 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
       "env": {
         "GITHUB_TOKEN": "your_github_personal_access_token",
         "GITHUB_OWNER": "your_github_username_or_org",
+        "GITHUB_OWNER_TYPE": "org",
         "ALLOWED_REPOS": "owner/repo,another/repo"
       }
     }
@@ -79,7 +82,19 @@ npx -y @smithery/cli install taylor-lindores-reeves/mcp-github-projects --client
 
 - `GITHUB_TOKEN`: GitHub Personal Access Token with appropriate permissions
 - `GITHUB_OWNER`: GitHub username or organization name
+- `GITHUB_OWNER_TYPE`: (Optional) Set to `user` (default) or `org`. Controls whether project listing and management is done for a user or an organization. Set to `org` if your projects live in a GitHub organization.
 - `ALLOWED_REPOS`: (Optional) Comma-separated list of allowed repository slugs (e.g. `owner/repo,another/repo`). All write operations (creating/updating issues, adding items to projects, etc.) are restricted to these repositories. If not set or empty, all repositories are allowed by default.
+
+**Example:**
+
+```
+GITHUB_TOKEN=your_github_personal_access_token
+GITHUB_OWNER=the-troops
+GITHUB_OWNER_TYPE=org
+ALLOWED_REPOS=the-troops/sms-troopers,manuelbiermann/convo-run
+```
+
+If you try to perform a write operation on a repository not in this list, the server will throw an error and block the action.
 
 ## GitHub Token Permissions
 

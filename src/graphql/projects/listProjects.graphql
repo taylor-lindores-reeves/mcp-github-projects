@@ -1,5 +1,28 @@
-query ListProjects($login: String!, $first: Int, $after: String) {
+# User-based query
+query ListUserProjects($login: String!, $first: Int, $after: String) {
   user(login: $login) {
+    projectsV2(first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        id
+        title
+        shortDescription
+        url
+        number
+        createdAt
+        updatedAt
+        closed
+      }
+    }
+  }
+}
+
+# Organization-based query
+query ListOrgProjects($login: String!, $first: Int, $after: String) {
+  organization(login: $login) {
     projectsV2(first: $first, after: $after) {
       pageInfo {
         hasNextPage
