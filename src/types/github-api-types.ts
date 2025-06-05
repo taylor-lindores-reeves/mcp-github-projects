@@ -31636,14 +31636,23 @@ export type GetProjectItemsQuery = { node: { items: { pageInfo: { hasNextPage: b
           & { __typename: 'Issue' | 'PullRequest' }
         ) | null } | null> | null } } | null };
 
-export type ListProjectsQueryVariables = Exact<{
+export type ListOrgProjectsQueryVariables = Exact<{
   login: Scalars['String']['input'];
   first: InputMaybe<Scalars['Int']['input']>;
   after: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type ListProjectsQuery = { user: { projectsV2: { pageInfo: { hasNextPage: boolean, endCursor: string | null }, nodes: Array<{ id: string, title: string, shortDescription: string | null, url: string, number: number, createdAt: string, updatedAt: string, closed: boolean } | null> | null } } | null };
+export type ListOrgProjectsQuery = { organization: { projectsV2: { pageInfo: { hasNextPage: boolean, endCursor: string | null }, nodes: Array<{ id: string, title: string, shortDescription: string | null, url: string, number: number, createdAt: string, updatedAt: string, closed: boolean } | null> | null } } | null };
+
+export type ListUserProjectsQueryVariables = Exact<{
+  login: Scalars['String']['input'];
+  first: InputMaybe<Scalars['Int']['input']>;
+  after: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ListUserProjectsQuery = { user: { projectsV2: { pageInfo: { hasNextPage: boolean, endCursor: string | null }, nodes: Array<{ id: string, title: string, shortDescription: string | null, url: string, number: number, createdAt: string, updatedAt: string, closed: boolean } | null> | null } } | null };
 
 export type MarkProjectV2AsTemplateMutationVariables = Exact<{
   input: MarkProjectV2AsTemplateInput;

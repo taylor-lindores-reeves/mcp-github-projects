@@ -22,6 +22,8 @@ import updateProjectV2Mutation from "../projects/updateProjectV2.graphql";
 import updateProjectV2FieldMutation from "../projects/updateProjectV2Field.graphql";
 import updateProjectV2ItemPositionMutation from "../projects/updateProjectV2ItemPosition.graphql";
 import updateProjectV2StatusUpdateMutation from "../projects/updateProjectV2StatusUpdate.graphql";
+import listUserProjectsQuery from "./listUserProjects.graphql";
+import listOrgProjectsQuery from "./listOrgProjects.graphql";
 
 // Export operations
 export const getProject = getProjectQuery;
@@ -37,7 +39,7 @@ export const deleteProjectV2 = deleteProjectV2Mutation;
 export const copyProjectV2 = copyProjectV2Mutation;
 export const addProjectV2DraftIssue = addProjectV2DraftIssueMutation;
 export const convertProjectV2DraftIssueToIssue =
-	convertProjectV2DraftIssueToIssueMutation;
+  convertProjectV2DraftIssueToIssueMutation;
 export const updateProjectV2ItemPosition = updateProjectV2ItemPositionMutation;
 export const deleteProjectV2Item = deleteProjectV2ItemMutation;
 export const createProjectV2Field = createProjectV2FieldMutation;
@@ -47,6 +49,8 @@ export const updateProjectV2StatusUpdate = updateProjectV2StatusUpdateMutation;
 export const archiveProjectV2Item = archiveProjectV2ItemMutation;
 export const unarchiveProjectV2Item = unarchiveProjectV2ItemMutation;
 export const clearProjectV2ItemFieldValue =
-	clearProjectV2ItemFieldValueMutation;
+  clearProjectV2ItemFieldValueMutation;
 export const markProjectV2AsTemplate = markProjectV2AsTemplateMutation;
 export const unmarkProjectV2AsTemplate = unmarkProjectV2AsTemplateMutation;
+export const listUserProjects = listUserProjectsQuery;
+export const listOrgProjects = listOrgProjectsQuery;

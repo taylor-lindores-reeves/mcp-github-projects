@@ -16,7 +16,6 @@ import {
   getProjectColumns,
   getProjectFields,
   getProjectItems,
-  listProjects,
   markProjectV2AsTemplate,
   unarchiveProjectV2Item,
   unmarkProjectV2AsTemplate,
@@ -25,6 +24,8 @@ import {
   updateProjectV2Field,
   updateProjectV2ItemPosition,
   updateProjectV2StatusUpdate,
+  listUserProjects,
+  listOrgProjects,
 } from "../graphql/projects/index.js";
 import {
   type AddProjectItemMutation,
@@ -68,8 +69,10 @@ import {
   type GetProjectItemsQueryVariables,
   type GetProjectQuery,
   type GetProjectQueryVariables,
-  type ListProjectsQuery,
-  type ListProjectsQueryVariables,
+  type ListOrgProjectsQuery,
+  type ListOrgProjectsQueryVariables,
+  type ListUserProjectsQuery,
+  type ListUserProjectsQueryVariables,
   type MarkProjectV2AsTemplateInput,
   type MarkProjectV2AsTemplateMutation,
   type MarkProjectV2AsTemplateMutationVariables,
@@ -473,6 +476,13 @@ function isRepoAllowedSlug(slug: string) {
   );
 }
 
+function getRepoSlug(owner: string, repo: string) {
+  // If repo already contains a slash, assume it's a full slug
+  return repo.includes("/")
+    ? repo.toLowerCase()
+    : `${owner}/${repo}`.toLowerCase();
+}
+
 /**
  * Helper to resolve the repository slug (owner/name) from an issue/PR node ID (contentId)
  */
@@ -497,7 +507,7 @@ async function getRepoSlugFromContentId(
     throw new Error(
       "Could not resolve repository slug for contentId: " + contentId
     );
-  return `${repo.owner.login}/${repo.name}`;
+  return getRepoSlug(repo.owner.login, repo.name);
 }
 
 // Project operations class
@@ -517,26 +527,29 @@ export class ProjectOperations {
     );
   }
 
-  async listProjects(params: ListProjectsQueryVariables) {
+  async listProjects(
+    params: ListUserProjectsQueryVariables | ListOrgProjectsQueryVariables
+  ) {
+    const ownerType = process.env.GITHUB_OWNER_TYPE || "user";
+    const isOrgOwner = ownerType === "org";
+    const query = isOrgOwner ? listOrgProjects : listUserProjects;
     const result = await this.client.graphql<
-      ListProjectsQuery,
-      ListProjectsQueryVariables
-    >(listProjects, {
+      ListUserProjectsQuery | ListOrgProjectsQuery,
+      ListUserProjectsQueryVariables | ListOrgProjectsQueryVariables
+    >(query, {
       login: this.owner,
       first: params?.first || 20,
       after: params?.after || null,
     });
-
-    // Determine if the response contains user data
-    const projectData = result.user?.projectsV2;
-
+    const projectData = isOrgOwner
+      ? (result as ListOrgProjectsQuery).organization?.projectsV2
+      : (result as ListUserProjectsQuery).user?.projectsV2;
     if (!projectData) {
       return {
         projects: [],
         pageInfo: { hasNextPage: false, endCursor: null },
       };
     }
-
     return {
       projects: projectData.nodes,
       pageInfo: projectData.pageInfo,
