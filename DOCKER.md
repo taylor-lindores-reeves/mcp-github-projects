@@ -36,6 +36,18 @@ Use the helper script `./scripts/docker.sh` for common operations:
 - `./scripts/docker.sh shell` - Open shell in development container
 - `./scripts/docker.sh test` - Run tests in container
 
+### Alternative: Makefile Commands
+
+For convenience, you can also use the included Makefile:
+
+- `make dev` - Start development environment
+- `make prod` - Start production environment
+- `make build` - Build Docker images
+- `make clean` - Clean up containers and images
+- `make logs` - Show container logs
+- `make shell` - Open shell in development container
+- `make help` - Show all available commands
+
 ## Manual Docker Commands
 
 ### Development

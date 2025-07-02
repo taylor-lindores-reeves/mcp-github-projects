@@ -133,6 +133,10 @@ For a complete Docker-based setup, see [DOCKER.md](./DOCKER.md) for detailed ins
 - `./scripts/docker.sh logs` - Show container logs
 - `./scripts/docker.sh shell` - Open shell in development container
 
+**Or use the Makefile for convenience:**
+- `make dev` / `make prod` / `make build` / `make clean` / `make logs` / `make shell`
+- `make help` - Show all available commands
+
 The development environment runs on `http://localhost:3000` and production on `http://localhost:3001`.
 
 ## GitHub Token Permissions
