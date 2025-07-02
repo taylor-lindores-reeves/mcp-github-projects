@@ -150,3 +150,62 @@ All services run on the `mcp-network` Docker network:
 3. Monitor logs: `./scripts/docker.sh logs`
 
 The production image is optimized and contains only the compiled application and runtime dependencies.
+
+## CI/CD and Container Registry
+
+### GitHub Actions Workflows
+
+The project includes several GitHub Actions workflows for automated building and deployment:
+
+#### 1. CI Workflow (`.github/workflows/ci.yml`)
+- Runs on every push to `main`/`develop` and pull requests
+- Tests both local Bun build and Docker builds
+- Validates TypeScript compilation
+- Uses GitHub Actions cache for faster builds
+
+#### 2. Docker Build Workflow (`.github/workflows/docker-build.yml`)
+- Builds and pushes Docker images to GitHub Container Registry
+- Supports multi-platform builds (linux/amd64, linux/arm64)
+- Includes security scanning with Trivy
+- Triggered on pushes to main branches and tags
+
+#### 3. Release Workflow (`.github/workflows/release.yml`)
+- Triggered when a GitHub release is published
+- Builds both production and development images
+- Publishes to GitHub Container Registry (and optionally Docker Hub)
+- Creates versioned tags following semantic versioning
+
+### Using Pre-built Images
+
+Instead of building locally, you can use pre-built images from GitHub Container Registry:
+
+```bash
+# Pull and run latest production image
+docker run -d --name mcp-github-projects \
+  -e GITHUB_TOKEN=your_token \
+  -e GITHUB_OWNER=your_username \
+  -p 3000:3000 \
+  ghcr.io/njdaniel/mcp-github-projects:latest
+
+# Pull specific version
+docker run -d --name mcp-github-projects \
+  -e GITHUB_TOKEN=your_token \
+  -e GITHUB_OWNER=your_username \
+  -p 3000:3000 \
+  ghcr.io/njdaniel/mcp-github-projects:v1.0.0
+```
+
+### Available Image Tags
+
+- `latest` - Latest stable release (production build)
+- `main` - Latest from main branch (production build)
+- `v*` - Specific version releases (e.g., `v1.0.0`)
+- `v*-dev` - Development builds for releases
+- `develop` - Latest from develop branch
+
+### Setting up Docker Hub Publishing (Optional)
+
+To also publish to Docker Hub, add these secrets to your GitHub repository:
+
+- `DOCKERHUB_USERNAME` - Your Docker Hub username
+- `DOCKERHUB_TOKEN` - Docker Hub access token

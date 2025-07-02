@@ -1,5 +1,5 @@
 # Makefile for MCP GitHub Projects
-.PHONY: help dev prod build clean logs shell test install docker-build docker-clean
+.PHONY: help dev prod build clean logs shell test install docker-build docker-clean ci check
 
 # Default target
 help:
@@ -14,6 +14,8 @@ help:
 	@echo "  make install      - Install dependencies locally with Bun"
 	@echo "  make local-build  - Build application locally"
 	@echo "  make local-dev    - Run development server locally"
+	@echo "  make ci           - Run CI checks locally"
+	@echo "  make check        - Run type checking"
 
 # Docker commands
 dev:
@@ -46,6 +48,12 @@ local-build:
 
 local-dev:
 	bun run dev
+
+# CI and validation commands
+ci: install check local-build
+
+check:
+	bunx tsc --noEmit
 
 # Aliases for compatibility
 docker-build: build

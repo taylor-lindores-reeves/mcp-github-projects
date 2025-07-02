@@ -1,6 +1,8 @@
 # GitHub Projects MCP Server
 
 [![smithery badge](https://smithery.ai/badge/mcp-github-projects)](https://smithery.ai/server/taylor-lindores-reeves/mcp-github-projects)
+[![CI](https://github.com/njdaniel/mcp-github-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/njdaniel/mcp-github-projects/actions/workflows/ci.yml)
+[![Docker Build](https://github.com/njdaniel/mcp-github-projects/actions/workflows/docker-build.yml/badge.svg)](https://github.com/njdaniel/mcp-github-projects/actions/workflows/docker-build.yml)
 
 An MCP (Model Context Protocol) server that enables AI agents to create and manage Agile Sprint-based projects using GitHub Projects.
 
@@ -101,6 +103,19 @@ If you try to perform a write operation on a repository not in this list, the se
 ### Quick Start with Docker
 
 For a complete Docker-based setup, see [DOCKER.md](./DOCKER.md) for detailed instructions.
+
+#### Using Pre-built Images
+
+```bash
+# Pull and run from GitHub Container Registry
+docker run -d --name mcp-github-projects \
+  -e GITHUB_TOKEN=your_token \
+  -e GITHUB_OWNER=your_username \
+  -p 3000:3000 \
+  ghcr.io/njdaniel/mcp-github-projects:latest
+```
+
+#### Building Locally
 
 1. **Clone and setup:**
    ```bash
