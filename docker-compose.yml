@@ -1,0 +1,60 @@
+services:
+  # Development service
+  mcp-github-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: mcp-github-projects-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - mcp-network
+
+  # Production service
+  mcp-github-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: mcp-github-projects-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    profiles:
+      - production
+
+  # Optional: Redis for caching (if needed in the future)
+  redis:
+    image: redis:7-alpine
+    container_name: mcp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    profiles:
+      - cache
+
+volumes:
+  redis_data:
+
+networks:
+  mcp-network:
+    driver: bridge
