@@ -1,0 +1,286 @@
+{
+  "projectName": "github-api-mcp-server",
+  "description": "MCP server for GitHub API with Agile project management features",
+  "rootDirectory": ".",
+  "analysisDate": "2025-01-17",
+  "directoryStructure": {
+    "rootFiles": {
+      ".env.example": {
+        "purpose": "Environment variables template",
+        "type": "configuration",
+        "importance": "important",
+        "description": "Template showing required environment variables for GitHub token, owner, and repository access"
+      },
+      ".gitignore": {
+        "purpose": "Git ignore patterns",
+        "type": "configuration",
+        "importance": "utility",
+        "description": "Specifies files and directories to ignore in version control"
+      },
+      "Dockerfile": {
+        "purpose": "Docker container configuration",
+        "type": "deployment",
+        "importance": "important",
+        "description": "Container setup for deploying the MCP server"
+      },
+      "LICENSE": {
+        "purpose": "MIT license file",
+        "type": "legal",
+        "importance": "utility",
+        "description": "Open source license terms"
+      },
+      "README.md": {
+        "purpose": "Project documentation",
+        "type": "documentation",
+        "importance": "critical",
+        "description": "Comprehensive project documentation including setup, usage, and API reference"
+      },
+      "build.ts": {
+        "purpose": "ESBuild configuration script",
+        "type": "build",
+        "importance": "critical",
+        "description": "Configures bundling of TypeScript source into executable JavaScript with GraphQL file handling"
+      },
+      "bun.lock": {
+        "purpose": "Bun package lock file",
+        "type": "dependency",
+        "importance": "utility",
+        "description": "Locks dependency versions for reproducible builds"
+      },
+      "codegen.ts": {
+        "purpose": "GraphQL code generation config",
+        "type": "build",
+        "importance": "critical",
+        "description": "Configures automatic TypeScript type generation from GitHub GraphQL schema"
+      },
+      "llms-full.txt": {
+        "purpose": "LLM context file",
+        "type": "documentation",
+        "importance": "utility",
+        "description": "Context file for language model interactions"
+      },
+      "package.json": {
+        "purpose": "Project metadata and dependencies",
+        "type": "configuration",
+        "importance": "critical",
+        "description": "Node.js project configuration with dependencies, scripts, and MCP server binary definition"
+      },
+      "schema.docs.graphql": {
+        "purpose": "GitHub GraphQL schema documentation",
+        "type": "schema",
+        "importance": "critical",
+        "description": "Complete GitHub GraphQL API schema used for type generation"
+      },
+      "smithery.yaml": {
+        "purpose": "Smithery deployment configuration",
+        "type": "deployment",
+        "importance": "important",
+        "description": "Configuration for deploying MCP server via Smithery platform"
+      },
+      "tsconfig.json": {
+        "purpose": "TypeScript configuration",
+        "type": "configuration",
+        "importance": "critical",
+        "description": "TypeScript compiler settings and project configuration"
+      }
+    },
+    "directories": {
+      ".git": {
+        "purpose": "Git repository metadata",
+        "type": "version_control",
+        "importance": "utility",
+        "description": "Git version control system files and history"
+      },
+      ".kiro": {
+        "purpose": "Kiro IDE configuration",
+        "type": "ide_config",
+        "importance": "utility",
+        "description": "Configuration and specifications for Kiro IDE",
+        "subdirectories": {
+          "specs": {
+            "purpose": "Feature specifications",
+            "description": "Contains feature specification documents for development workflow"
+          }
+        }
+      },
+      "build": {
+        "purpose": "Compiled output directory",
+        "type": "build_output",
+        "importance": "critical",
+        "description": "Contains the compiled JavaScript executable for the MCP server",
+        "keyFiles": {
+          "index.js": "Main executable MCP server file with shebang for CLI execution"
+        }
+      },
+      "node_modules": {
+        "purpose": "Dependencies",
+        "type": "dependency",
+        "importance": "utility",
+        "description": "Installed npm/bun packages and dependencies"
+      },
+      "src": {
+        "purpose": "Source code directory",
+        "type": "source",
+        "importance": "critical",
+        "description": "Main TypeScript source code organized in layered architecture",
+        "architecture": "layered",
+        "subdirectories": {
+          "index.ts": {
+            "purpose": "Main MCP server entry point",
+            "type": "entry_point",
+            "importance": "critical",
+            "description": "Registers MCP tools and prompts, configures server capabilities, handles stdio transport"
+          },
+          "common": {
+            "purpose": "Shared utilities",
+            "type": "utility",
+            "importance": "important",
+            "description": "Common utilities and error handling shared across the application",
+            "files": {
+              "errors.ts": "Error handling utilities and custom error types",
+              "utils.ts": "Shared utility functions used throughout the application"
+            }
+          },
+          "operations": {
+            "purpose": "Business logic layer",
+            "type": "business_logic",
+            "importance": "critical",
+            "description": "Wraps GitHub API calls with business logic and validation",
+            "files": {
+              "index.ts": "Barrel exports for all operations and operation instances",
+              "github-client.ts": "GitHub API client wrapper with Octokit configuration and plugins",
+              "projects.ts": "GitHub Projects v2 operations - CRUD, field management, item management",
+              "issues.ts": "GitHub Issues operations - creation, reading, updating, project integration",
+              "repositories.ts": "Repository operations - information retrieval and management"
+            }
+          },
+          "graphql": {
+            "purpose": "GraphQL queries and mutations",
+            "type": "api_layer",
+            "importance": "critical",
+            "description": "GraphQL operations organized by feature domain",
+            "files": {
+              "index.ts": "GraphQL operations barrel export"
+            },
+            "subdirectories": {
+              "issues": {
+                "purpose": "Issue-related GraphQL operations",
+                "files": {
+                  "getIssue.graphql": "Query to fetch single issue with details, assignees, labels",
+                  "index.ts": "Issue GraphQL operations exports"
+                }
+              },
+              "projects": {
+                "purpose": "Project-related GraphQL operations",
+                "description": "Comprehensive set of GitHub Projects v2 GraphQL operations",
+                "files": {
+                  "getProject.graphql": "Query to fetch project details and metadata",
+                  "createProjectV2.graphql": "Mutation to create new GitHub project",
+                  "updateProjectV2.graphql": "Mutation to update existing project",
+                  "deleteProjectV2.graphql": "Mutation to delete project",
+                  "getProjectItems.graphql": "Query to fetch items within a project",
+                  "addProjectV2ItemById.graphql": "Mutation to add existing items to project",
+                  "updateProjectItemFieldValue.graphql": "Mutation to update item field values",
+                  "getProjectFields.graphql": "Query to fetch project custom fields",
+                  "getProjectColumns.graphql": "Query to fetch project status columns",
+                  "index.ts": "Project GraphQL operations exports"
+                }
+              },
+              "repositories": {
+                "purpose": "Repository GraphQL operations",
+                "files": {
+                  "getRepository.graphql": "Query to fetch repository details and metadata",
+                  "index.ts": "Repository GraphQL operations exports"
+                }
+              }
+            }
+          },
+          "types": {
+            "purpose": "Type definitions",
+            "type": "types",
+            "importance": "critical",
+            "description": "TypeScript type definitions for API operations",
+            "files": {
+              "github-api-types.ts": "Auto-generated TypeScript types from GitHub GraphQL schema",
+              "graphql.d.ts": "GraphQL type declarations and module definitions"
+            }
+          },
+          "utils": {
+            "purpose": "Utility functions",
+            "type": "utility",
+            "importance": "important",
+            "description": "Utility functions for GraphQL and file operations",
+            "files": {
+              "graphql-loader.ts": "GraphQL file loading utilities for development and production"
+            }
+          }
+        }
+      }
+    }
+  },
+  "keyFiles": [
+    {
+      "path": "src/index.ts",
+      "purpose": "MCP server entry point and tool registration",
+      "importance": "critical"
+    },
+    {
+      "path": "package.json",
+      "purpose": "Project configuration and dependencies",
+      "importance": "critical"
+    },
+    {
+      "path": "README.md",
+      "purpose": "Project documentation and setup guide",
+      "importance": "critical"
+    },
+    {
+      "path": "build.ts",
+      "purpose": "Build configuration and bundling",
+      "importance": "critical"
+    },
+    {
+      "path": "codegen.ts",
+      "purpose": "GraphQL type generation configuration",
+      "importance": "critical"
+    },
+    {
+      "path": "src/operations/github-client.ts",
+      "purpose": "GitHub API client wrapper",
+      "importance": "critical"
+    },
+    {
+      "path": "src/operations/projects.ts",
+      "purpose": "GitHub Projects v2 business logic",
+      "importance": "critical"
+    },
+    {
+      "path": "src/types/github-api-types.ts",
+      "purpose": "Auto-generated GitHub API types",
+      "importance": "critical"
+    },
+    {
+      "path": "schema.docs.graphql",
+      "purpose": "GitHub GraphQL schema for type generation",
+      "importance": "critical"
+    }
+  ],
+  "architecturalPatterns": [
+    "Layered Architecture",
+    "Feature-based Organization",
+    "Type-safe API Wrapper",
+    "Auto-generated Types",
+    "Modular GraphQL Operations"
+  ],
+  "buildProcess": [
+    "GraphQL Codegen generates TypeScript types from schema",
+    "ESBuild bundles and minifies TypeScript code",
+    "Output is single executable JavaScript file"
+  ],
+  "verificationStatus": {
+    "allPathsExist": true,
+    "allDescriptionsAccurate": true,
+    "architectureDocumented": true,
+    "keyFilesIdentified": true
+  }
+}
